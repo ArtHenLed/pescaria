@@ -2,79 +2,71 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=576, height=384">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Previsão de Pescaria</title>
   <style>
     body {
-      margin: 0;
-      background-color: #0f1f2e;
-      font-family: Arial, sans-serif;
+      background-color: #0c1d2c;
       color: white;
+      font-family: Arial, sans-serif;
       text-align: center;
+      margin: 0;
+      padding: 0;
     }
-
     .logo {
-      margin-top: 10px;
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: bold;
     }
-
-    .logo img {
-      height: 40px;
+    .slogan {
+      font-size: 14px;
+      margin-bottom: 10px;
     }
-
     h1 {
       font-size: 22px;
-      margin: 4px 0 10px;
+      margin: 10px 0 30px 0;
     }
-
-    .container {
+    .cards {
       display: flex;
       justify-content: center;
-      gap: 20px;
-      padding: 0 20px;
+      gap: 40px;
+      margin: 0 20px;
     }
-
     .card {
-      background-color: #1c2d44;
+      background-color: #16324d;
       border-radius: 12px;
-      padding: 12px;
-      width: 130px;
+      padding: 20px;
+      width: 220px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
     }
-
     .card h2 {
       font-size: 16px;
       margin: 0;
     }
-
-    .card .date {
+    .card .data {
       font-size: 14px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
-
     .icon {
-      font-size: 34px;
-      margin-bottom: 8px;
+      font-size: 32px;
+      margin: 10px 0;
     }
-
-    .grid {
+    .grid-info {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      row-gap: 4px;
-      column-gap: 10px;
+      grid-gap: 8px;
       font-size: 13px;
-    }
-
-    .grid div {
       text-align: left;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="logo">
-    <img src="marcadagua.jpg" alt="Logo MIDIAH">
-  </div>
+  <div class="logo">MIDIAH</div>
+  <div class="slogan">ILUMINANDO IDEIAS</div>
   <h1>PREVISÃO DE PESCARIA</h1>
-
-  {{PREVISAO_PESCARIA}}
-
+  <div class="cards">
+    {{PREVISAO_PESCARIA}}
+  </div>
 </body>
 </html>
