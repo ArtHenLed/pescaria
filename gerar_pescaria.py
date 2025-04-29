@@ -2,119 +2,96 @@ import requests
 import datetime
 import os
 
-def obter_previsao(dia):
-    latitude = -24.7300
-    longitude = -47.5500
-    api_key = os.environ["STORMGLASS_API_KEY"]
+def fase_lua(valor):
+    if valor < 0.1:
+        return "Lua Nova"
+    elif valor < 0.25:
+        return "Crescente"
+    elif valor < 0.5:
+        return "Quarto Crescente"
+    elif valor < 0.6:
+        return "Lua Cheia"
+    elif valor < 0.75:
+        return "Minguante"
+    else:
+        return "Quarto Minguante"
 
-    data_inicio = dia.isoformat()
-    data_fim = (dia + datetime.timedelta(days=1)).isoformat()
+def gerar_card(dia, dados):
+    return f'''
+    <div class="container">
+        <div class="card">
+            <h2>{dia.upper()}</h2>
+            <div class="icon">{dados['icone']}</div>
+            <p class="info-box">
+                <span>Vento<br>{dados['vento']}</span>
+                <span>Temp. água<br>{dados['temp_agua']}</span>
+                <span>Pressão<br>{dados['pressao']}</span>
+                <span>{dados['lua']}</span>
+            </p>
+        </div>
+    </div>
+    '''
 
-    parametros = ['waterTemperature', 'windSpeed', 'moonPhase', 'pressure']
+def montar_previsao(data):
+    data_str = data.strftime('%Y-%m-%d')
+    url = f"https://api.stormglass.io/v2/weather/point/daily"
 
-    url = f'https://api.stormglass.io/v2/weather/point'
-    headers = {'Authorization': api_key}
     params = {
-        'lat': latitude,
-        'lng': longitude,
-        'params': ','.join(parametros),
-        'start': data_inicio,
-        'end': data_fim,
-        'source': 'noaa'
+        'lat': -24.730,
+        'lng': -47.550,
+        'params': ','.join([
+            'waterTemperature', 'windSpeed', 'pressure', 'moonPhase'
+        ]),
+        'start': data_str,
+        'end': data_str
     }
 
-    response = requests.get(url, headers=headers, params=params)
+    headers = {
+        'Authorization': os.getenv('STORMGLASS_API_KEY')
+    }
+
+    response = requests.get(url, params=params, headers=headers)
     response_json = response.json()
 
-    if "hours" not in response_json:
-        print("Erro: resposta sem campo 'hours'")
+    if 'days' not in response_json or len(response_json['days']) == 0:
+        print("Erro: resposta sem campo 'days'")
         print("Resposta completa:", response_json)
         exit(1)
 
-    dados = response_json["hours"]
-
-    hora_alvo = 12  # meio-dia UTC
-    for hora in dados:
-        timestamp = hora["time"]
-        hora_dt = datetime.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-        if hora_dt.hour == hora_alvo:
-            vento = hora.get("windSpeed", {}).get("noaa", 0)
-            agua = hora.get("waterTemperature", {}).get("noaa", 0)
-            pressao = hora.get("pressure", {}).get("noaa", 0)
-            lua_valor = hora.get("moonPhase", {}).get("noaa", 0)
-
-            return {
-                "data": hora_dt.strftime("%d/%m"),
-                "icone": "☀️",
-                "vento": f"{vento:.1f} km/h",
-                "temp_agua": f"{agua:.1f} °C",
-                "pressao": f"{pressao:.1f} hPa",
-                "lua": fase_lua_por_valor(lua_valor)
-            }
+    dados = response_json['days'][0]
 
     return {
-        "data": dia.strftime("%d/%m"),
-        "icone": "❓",
-        "vento": "--",
-        "temp_agua": "--",
-        "pressao": "--",
-        "lua": "--"
+        'data': data.strftime('%d/%m'),
+        'icone': '☀️',
+        'vento': f"{round(dados['windSpeed']['noaa'], 1)} km/h",
+        'temp_agua': f"{round(dados['waterTemperature']['noaa'], 1)} °C",
+        'pressao': f"{round(dados['pressure']['noaa'], 1)} hPa",
+        'lua': fase_lua(dados['moonPhase']['noaa'])
     }
 
-def fase_lua_por_valor(valor):
-    if valor < 0.1 or valor > 0.9:
-        return "Lua Nova"
-    elif 0.1 <= valor < 0.25:
-        return "Crescente"
-    elif 0.25 <= valor < 0.45:
-        return "Quarto Crescente"
-    elif 0.45 <= valor < 0.55:
-        return "Lua Cheia"
-    elif 0.55 <= valor < 0.75:
-        return "Minguante"
-    elif 0.75 <= valor <= 0.9:
-        return "Quarto Minguante"
-    else:
-        return "Desconhecida"
+# Gerar cards para sábado e domingo
+hoje = datetime.datetime.now()
+sabado = hoje + datetime.timedelta((5 - hoje.weekday()) % 7)
+domingo = hoje + datetime.timedelta((6 - hoje.weekday()) % 7)
 
-def gerar_card(dia_semana, dados):
-    return f"""
-    <div class="card">
-      <h2>{dia_semana.upper()}</h2>
-      <div class="date">{dados['data']}</div>
-      <div class="icon">{dados['icone']}</div>
-      <div class="grid">
-        <div>🌀 {dados['vento']}</div>
-        <div>🌡️ {dados['temp_agua']}</div>
-        <div>⚖️ {dados['pressao']}</div>
-        <div>🌕 {dados['lua']}</div>
-      </div>
-    </div>
-    """
-
-# Calcular sábado e domingo mais próximos
-hoje = datetime.date.today()
-dias_ate_sabado = (5 - hoje.weekday()) % 7
-dias_ate_domingo = (6 - hoje.weekday()) % 7
-sabado = hoje + datetime.timedelta(days=dias_ate_sabado)
-domingo = hoje + datetime.timedelta(days=dias_ate_domingo)
-
-previsao = {
-    "sabado": obter_previsao(sabado),
-    "domingo": obter_previsao(domingo)
-}
+data_sabado = montar_previsao(sabado)
+data_domingo = montar_previsao(domingo)
 
 html_cards = f"""
-<div class="container">
-  {gerar_card("Sábado", previsao['sabado'])}
-  {gerar_card("Domingo", previsao['domingo'])}
+<div class='card-container'>
+    {gerar_card('Sábado', data_sabado)}
+    {gerar_card('Domingo', data_domingo)}
 </div>
 """
 
+# Carregar HTML base
 with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
 
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 
+# Salvar resultado
 with open("index.html", "w", encoding="utf-8") as saida:
     saida.write(html_final)
+
+print("Previsão de pescaria gerada com sucesso!")
