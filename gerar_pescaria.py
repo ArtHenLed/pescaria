@@ -6,10 +6,10 @@ from datetime import datetime, timedelta
 LATITUDE = -24.7300
 LONGITUDE = -47.5500
 
-# Chave da API via variável de ambiente segura
+# API Key (GitHub Secret)
 API_KEY = os.getenv("STORMGLASS_API_KEY")
 
-# Cálculo de sábado e domingo seguintes
+# Calcula datas de sábado e domingo
 hoje = datetime.utcnow()
 dias_ate_sabado = (5 - hoje.weekday()) % 7
 dias_ate_domingo = (6 - hoje.weekday()) % 7
@@ -17,13 +17,13 @@ dias_ate_domingo = (6 - hoje.weekday()) % 7
 data_sabado = (hoje + timedelta(days=dias_ate_sabado)).strftime("%Y-%m-%d")
 data_domingo = (hoje + timedelta(days=dias_ate_domingo)).strftime("%Y-%m-%d")
 
-# Consulta à Stormglass
-response = requests.get(
+# Requisição de dados climáticos
+weather_response = requests.get(
     "https://api.stormglass.io/v2/weather/point",
     params={
         "lat": LATITUDE,
         "lng": LONGITUDE,
-        "params": "waterTemperature,windSpeed,windDirection,airTemperature,pressure,moonPhase",
+        "params": "waterTemperature,windSpeed,windDirection,pressure",
         "start": f"{data_sabado}T00:00:00+00:00",
         "end": f"{data_domingo}T23:59:59+00:00",
         "source": "noaa"
@@ -31,15 +31,30 @@ response = requests.get(
     headers={"Authorization": API_KEY}
 )
 
-# Verificação de erro
-response_json = response.json()
+# Requisição de fase da lua (astronomia)
+astro_response = requests.get(
+    "https://api.stormglass.io/v2/astronomy/point",
+    params={
+        "lat": LATITUDE,
+        "lng": LONGITUDE,
+        "start": f"{data_sabado}T00:00:00+00:00",
+        "end": f"{data_domingo}T23:59:59+00:00"
+    },
+    headers={"Authorization": API_KEY}
+)
 
-if "hours" not in response_json:
-    print("Erro: resposta sem campo 'hours'")
-    print("Resposta completa:", response_json)
+# Tratamento de erro
+weather_json = weather_response.json()
+astro_json = astro_response.json()
+
+if "hours" not in weather_json or "data" not in astro_json:
+    print("Erro ao obter dados da API")
+    print("Weather JSON:", weather_json)
+    print("Astro JSON:", astro_json)
     exit(1)
 
-dados = response_json["hours"]
+dados = weather_json["hours"]
+dados_lua = astro_json["data"]
 
 # Funções auxiliares
 def media_por_dia(dados, campo, data_alvo):
@@ -47,9 +62,7 @@ def media_por_dia(dados, campo, data_alvo):
     return round(sum(valores) / len(valores), 1) if valores else None
 
 def fase_lua(valor):
-    if valor is None:
-        return "Desconhecida"
-    elif valor < 0.1 or valor > 0.9:
+    if valor < 0.1 or valor > 0.9:
         return "Lua Nova"
     elif 0.1 <= valor < 0.25:
         return "Crescente"
@@ -62,6 +75,12 @@ def fase_lua(valor):
     else:
         return "Quarto Minguante"
 
+def fase_lua_por_data(data_alvo):
+    for d in dados_lua:
+        if d["time"].startswith(data_alvo):
+            return fase_lua(d["moonPhase"])
+    return "Desconhecida"
+
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
     return {
@@ -69,7 +88,7 @@ def montar_previsao(data_iso):
         "vento": f"{media_por_dia(dados, 'windSpeed', data_iso)} km/h",
         "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C",
         "pressao": f"{media_por_dia(dados, 'pressure', data_iso)} hPa",
-        "lua": fase_lua(media_por_dia(dados, 'moonPhase', data_iso)),
+        "lua": fase_lua_por_data(data_iso),
         "icone": "🌤️"
     }
 
@@ -90,11 +109,10 @@ def gerar_card(dia, dados):
     </div>
     """
 
-# Lê HTML base
+# Monta o HTML
 with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
 
-# Insere cards lado a lado
 html_cards = f"""
 <div class="container">
   {gerar_card("Sábado", previsao['sabado'])}
@@ -102,9 +120,9 @@ html_cards = f"""
 </div>
 """
 
-# Substitui marcador no HTML base
+# Substitui no HTML
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 
-# Salva HTML final
+# Salva o HTML final
 with open("index.html", "w", encoding="utf-8") as saida:
     saida.write(html_final)
