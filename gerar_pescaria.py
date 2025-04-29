@@ -78,7 +78,7 @@ def fase_lua(valor):
 def fase_lua_por_data(data_alvo):
     for d in dados_lua:
         if d["time"].startswith(data_alvo):
-            return fase_lua(d["moonPhase"]["value"])
+            return fase_lua(d["moonPhase"])
     return "Desconhecida"
 
 def montar_previsao(data_iso):
