@@ -2,14 +2,14 @@ import os
 import requests
 from datetime import datetime, timedelta
 
-# Coordenadas de Ilha Comprida (SP)
+# Coordenadas de Ilha Comprida
 LATITUDE = -24.7300
 LONGITUDE = -47.5500
 
-# API KEY via variável de ambiente
+# Chave da API via variável de ambiente segura
 API_KEY = os.getenv("STORMGLASS_API_KEY")
 
-# Datas de sábado e domingo seguintes
+# Cálculo de sábado e domingo seguintes
 hoje = datetime.utcnow()
 dias_ate_sabado = (5 - hoje.weekday()) % 7
 dias_ate_domingo = (6 - hoje.weekday()) % 7
@@ -17,9 +17,9 @@ dias_ate_domingo = (6 - hoje.weekday()) % 7
 data_sabado = (hoje + timedelta(days=dias_ate_sabado)).strftime("%Y-%m-%d")
 data_domingo = (hoje + timedelta(days=dias_ate_domingo)).strftime("%Y-%m-%d")
 
-# Chamada para pegar dados dos dois dias
+# Consulta à Stormglass
 response = requests.get(
-    f"https://api.stormglass.io/v2/weather/point",
+    "https://api.stormglass.io/v2/weather/point",
     params={
         "lat": LATITUDE,
         "lng": LONGITUDE,
@@ -31,16 +31,25 @@ response = requests.get(
     headers={"Authorization": API_KEY}
 )
 
-dados = response.json()["hours"]
+# Verificação de erro
+response_json = response.json()
 
-# Função auxiliar para encontrar o valor médio de um parâmetro em um dia
+if "hours" not in response_json:
+    print("Erro: resposta sem campo 'hours'")
+    print("Resposta completa:", response_json)
+    exit(1)
+
+dados = response_json["hours"]
+
+# Funções auxiliares
 def media_por_dia(dados, campo, data_alvo):
     valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
     return round(sum(valores) / len(valores), 1) if valores else None
 
-# Função para traduzir fase da lua
 def fase_lua(valor):
-    if valor < 0.1 or valor > 0.9:
+    if valor is None:
+        return "Desconhecida"
+    elif valor < 0.1 or valor > 0.9:
         return "Lua Nova"
     elif 0.1 <= valor < 0.25:
         return "Crescente"
@@ -53,10 +62,9 @@ def fase_lua(valor):
     else:
         return "Quarto Minguante"
 
-# Monta os dados para os dois dias
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
-    dados_dia = {
+    return {
         "data": dia.strftime("%d/%m"),
         "vento": f"{media_por_dia(dados, 'windSpeed', data_iso)} km/h",
         "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C",
@@ -64,14 +72,12 @@ def montar_previsao(data_iso):
         "lua": fase_lua(media_por_dia(dados, 'moonPhase', data_iso)),
         "icone": "🌤️"
     }
-    return dados_dia
 
 previsao = {
     "sabado": montar_previsao(data_sabado),
     "domingo": montar_previsao(data_domingo)
 }
 
-# Gera HTML de cada card
 def gerar_card(dia, dados):
     return f"""
     <div class="card">
@@ -88,7 +94,7 @@ def gerar_card(dia, dados):
 with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
 
-# Monta os dois cards
+# Insere cards lado a lado
 html_cards = f"""
 <div class="container">
   {gerar_card("Sábado", previsao['sabado'])}
@@ -96,9 +102,9 @@ html_cards = f"""
 </div>
 """
 
-# Gera HTML final
+# Substitui marcador no HTML base
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 
-# Salva index.html
+# Salva HTML final
 with open("index.html", "w", encoding="utf-8") as saida:
     saida.write(html_final)
