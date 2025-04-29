@@ -1,130 +1,120 @@
-import os
 import requests
-from datetime import datetime, timedelta
+import datetime
+import os
 
-# Coordenadas de Ilha Comprida
-LATITUDE = -24.7300
-LONGITUDE = -47.5500
+def obter_previsao(dia):
+    latitude = -24.7300
+    longitude = -47.5500
+    api_key = os.environ["STORMGLASS_API_KEY"]
 
-# API Key (armazenada como segredo no GitHub)
-API_KEY = os.getenv("STORMGLASS_API_KEY")
+    data_inicio = dia.isoformat()
+    data_fim = (dia + datetime.timedelta(days=1)).isoformat()
 
-# Cálculo das datas do próximo sábado e domingo
-hoje = datetime.utcnow()
-dias_ate_sabado = (5 - hoje.weekday()) % 7
-dias_ate_domingo = (6 - hoje.weekday()) % 7
+    parametros = ['waterTemperature', 'windSpeed', 'moonPhase', 'pressure']
 
-data_sabado = (hoje + timedelta(days=dias_ate_sabado)).strftime("%Y-%m-%d")
-data_domingo = (hoje + timedelta(days=dias_ate_domingo)).strftime("%Y-%m-%d")
+    url = f'https://api.stormglass.io/v2/weather/point'
+    headers = {'Authorization': api_key}
+    params = {
+        'lat': latitude,
+        'lng': longitude,
+        'params': ','.join(parametros),
+        'start': data_inicio,
+        'end': data_fim,
+        'source': 'noaa'
+    }
 
-# Consulta aos dados climáticos (vento, pressão, temperatura da água)
-weather_response = requests.get(
-    "https://api.stormglass.io/v2/weather/point",
-    params={
-        "lat": LATITUDE,
-        "lng": LONGITUDE,
-        "params": "waterTemperature,windSpeed,windDirection,pressure",
-        "start": f"{data_sabado}T00:00:00+00:00",
-        "end": f"{data_domingo}T23:59:59+00:00",
-        "source": "noaa"
-    },
-    headers={"Authorization": API_KEY}
-)
+    response = requests.get(url, headers=headers, params=params)
+    response_json = response.json()
 
-# Consulta da fase da lua
-astro_response = requests.get(
-    "https://api.stormglass.io/v2/astronomy/point",
-    params={
-        "lat": LATITUDE,
-        "lng": LONGITUDE,
-        "start": f"{data_sabado}T00:00:00+00:00",
-        "end": f"{data_domingo}T23:59:59+00:00"
-    },
-    headers={"Authorization": API_KEY}
-)
+    if "hours" not in response_json:
+        print("Erro: resposta sem campo 'hours'")
+        print("Resposta completa:", response_json)
+        exit(1)
 
-# Tratamento das respostas
-weather_json = weather_response.json()
-astro_json = astro_response.json()
+    dados = response_json["hours"]
 
-if "hours" not in weather_json or "data" not in astro_json:
-    print("Erro ao obter dados da API")
-    print("Weather JSON:", weather_json)
-    print("Astro JSON:", astro_json)
-    exit(1)
+    hora_alvo = 12  # meio-dia UTC
+    for hora in dados:
+        timestamp = hora["time"]
+        hora_dt = datetime.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        if hora_dt.hour == hora_alvo:
+            vento = hora.get("windSpeed", {}).get("noaa", 0)
+            agua = hora.get("waterTemperature", {}).get("noaa", 0)
+            pressao = hora.get("pressure", {}).get("noaa", 0)
+            lua_valor = hora.get("moonPhase", {}).get("noaa", 0)
 
-dados = weather_json["hours"]
-dados_lua = astro_json["data"]
+            return {
+                "data": hora_dt.strftime("%d/%m"),
+                "icone": "☀️",
+                "vento": f"{vento:.1f} km/h",
+                "temp_agua": f"{agua:.1f} °C",
+                "pressao": f"{pressao:.1f} hPa",
+                "lua": fase_lua_por_valor(lua_valor)
+            }
 
-# Funções auxiliares
-def media_por_dia(dados, campo, data_alvo):
-    valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
-    return round(sum(valores) / len(valores), 1) if valores else 0
+    return {
+        "data": dia.strftime("%d/%m"),
+        "icone": "❓",
+        "vento": "--",
+        "temp_agua": "--",
+        "pressao": "--",
+        "lua": "--"
+    }
 
-def fase_lua(valor):
+def fase_lua_por_valor(valor):
     if valor < 0.1 or valor > 0.9:
         return "Lua Nova"
     elif 0.1 <= valor < 0.25:
         return "Crescente"
-    elif 0.25 <= valor < 0.5:
+    elif 0.25 <= valor < 0.45:
         return "Quarto Crescente"
-    elif 0.5 <= valor < 0.75:
+    elif 0.45 <= valor < 0.55:
         return "Lua Cheia"
-    elif 0.75 <= valor <= 0.9:
+    elif 0.55 <= valor < 0.75:
         return "Minguante"
-    else:
+    elif 0.75 <= valor <= 0.9:
         return "Quarto Minguante"
+    else:
+        return "Desconhecida"
 
-def fase_lua_por_data(data_alvo):
-    for d in dados_lua:
-        if d["time"].startswith(data_alvo):
-            valor = d["moonPhase"]
-            if isinstance(valor, dict):
-                valor = valor.get("noaa", 0)
-            return fase_lua(valor)
-    return "Desconhecida"
-
-def montar_previsao(data_iso):
-    dia = datetime.strptime(data_iso, "%Y-%m-%d")
-    return {
-        "data": dia.strftime("%d/%m"),
-        "vento": f"{media_por_dia(dados, 'windSpeed', data_iso)} km/h",
-        "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C",
-        "pressao": f"{media_por_dia(dados, 'pressure', data_iso)} hPa",
-        "lua": fase_lua_por_data(data_iso),
-        "icone": "☀️"  # Sol como placeholder
-    }
-
-previsao = {
-    "sabado": montar_previsao(data_sabado),
-    "domingo": montar_previsao(data_domingo)
-}
-
-def gerar_card(dia, dados):
+def gerar_card(dia_semana, dados):
     return f"""
-    <div class=\"card\">
-        <h2>{dia.upper()}<br>{dados['data']}</h2>
-        <div class=\"icon\">{dados['icone']}</div>
-        <p>Vento<br>{dados['vento']}</p>
-        <p>Temperatura da água<br>{dados['temp_agua']}</p>
-        <p>Pressão<br>{dados['pressao']}</p>
-        <p>Fase da lua<br>{dados['lua']}</p>
+    <div class="card">
+      <h2>{dia_semana.upper()}</h2>
+      <div class="date">{dados['data']}</div>
+      <div class="icon">{dados['icone']}</div>
+      <div class="grid">
+        <div>🌀 {dados['vento']}</div>
+        <div>🌡️ {dados['temp_agua']}</div>
+        <div>⚖️ {dados['pressao']}</div>
+        <div>🌕 {dados['lua']}</div>
+      </div>
     </div>
     """
 
-# Monta HTML final
-with open("index_base.html", "r", encoding="utf-8") as base:
-    html_base = base.read()
+# Calcular sábado e domingo mais próximos
+hoje = datetime.date.today()
+dias_ate_sabado = (5 - hoje.weekday()) % 7
+dias_ate_domingo = (6 - hoje.weekday()) % 7
+sabado = hoje + datetime.timedelta(days=dias_ate_sabado)
+domingo = hoje + datetime.timedelta(days=dias_ate_domingo)
+
+previsao = {
+    "sabado": obter_previsao(sabado),
+    "domingo": obter_previsao(domingo)
+}
 
 html_cards = f"""
-<div class=\"container\">
+<div class="container">
   {gerar_card("Sábado", previsao['sabado'])}
   {gerar_card("Domingo", previsao['domingo'])}
 </div>
 """
 
+with open("index_base.html", "r", encoding="utf-8") as base:
+    html_base = base.read()
+
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 
-# Salva
 with open("index.html", "w", encoding="utf-8") as saida:
     saida.write(html_final)
