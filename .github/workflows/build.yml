@@ -2,8 +2,8 @@ name: Gerar previsão de pescaria
 
 on:
   schedule:
-    - cron: '0 4 * * *'  # Executa todos os dias às 4h da manhã UTC (~1h da madrugada no Brasil)
-  workflow_dispatch:     # Permite executar manualmente
+    - cron: '0 9 * * *'  # 06:00 da manhã (Brasília) = 09:00 UTC
+  workflow_dispatch:     # Permite execução manual também
 
 jobs:
   build:
@@ -21,10 +21,10 @@ jobs:
       - name: Instalar dependências
         run: pip install requests
 
-      - name: Criar variável de ambiente com chave da API
+      - name: Definir chave da API como variável de ambiente
         run: echo "STORMGLASS_API_KEY=${{ secrets.STORMGLASS_API_KEY }}" >> $GITHUB_ENV
 
-      - name: Executar script
+      - name: Executar script de previsão
         run: python gerar_pescaria.py
 
       - name: Commit do HTML gerado
