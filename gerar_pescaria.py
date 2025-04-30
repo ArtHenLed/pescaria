@@ -34,12 +34,6 @@ def gerar_card(dia, dados):
 
 def montar_previsao(data):
     data_str = data.strftime('%Y-%m-%d')
-    api_key = os.getenv('STORMGLASS_API_KEY')
-
-    if not api_key:
-        print("Erro: chave da API não encontrada.")
-        exit(1)
-
     url = "https://api.stormglass.io/v2/weather/point"
 
     params = {
@@ -48,18 +42,18 @@ def montar_previsao(data):
         'params': ','.join([
             'waterTemperature', 'windSpeed', 'pressure', 'moonPhase'
         ]),
-        'start': data_str,
-        'end': data_str
+        'start': f"{data_str}T00:00:00+00:00",
+        'end': f"{data_str}T23:59:59+00:00",
+        'source': 'noaa'
     }
 
     headers = {
-        'Authorization': api_key
+        'Authorization': os.getenv('STORMGLASS_API_KEY')
     }
 
     response = requests.get(url, params=params, headers=headers)
-
     if response.status_code != 200:
-        print("Erro na requisição:", response.status_code)
+        print(f"Erro na requisição: {response.status_code}")
         print("Resposta:", response.text)
         exit(1)
 
@@ -70,8 +64,7 @@ def montar_previsao(data):
         print("Resposta completa:", response_json)
         exit(1)
 
-    # Pega dados da primeira hora disponível
-    dados = response_json['hours'][0]
+    dados = response_json['hours'][0]  # Pega o primeiro horário do dia
 
     return {
         'data': data.strftime('%d/%m'),
