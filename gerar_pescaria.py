@@ -17,13 +17,13 @@ dias_ate_domingo = (6 - hoje.weekday()) % 7
 data_sabado = (hoje + timedelta(days=dias_ate_sabado)).strftime("%Y-%m-%d")
 data_domingo = (hoje + timedelta(days=dias_ate_domingo)).strftime("%Y-%m-%d")
 
-# Consulta aos dados climáticos
+# Consulta aos dados climáticos (vento, pressão, temperatura da água)
 weather_response = requests.get(
     "https://api.stormglass.io/v2/weather/point",
     params={
         "lat": LATITUDE,
         "lng": LONGITUDE,
-        "params": "waterTemperature,windSpeed,pressure",
+        "params": "waterTemperature,windSpeed,windDirection,pressure",
         "start": f"{data_sabado}T00:00:00+00:00",
         "end": f"{data_domingo}T23:59:59+00:00",
         "source": "noaa"
@@ -43,7 +43,7 @@ astro_response = requests.get(
     headers={"Authorization": API_KEY}
 )
 
-# Processamento das respostas
+# Tratamento das respostas
 weather_json = weather_response.json()
 astro_json = astro_response.json()
 
@@ -92,7 +92,7 @@ def montar_previsao(data_iso):
         "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C",
         "pressao": f"{media_por_dia(dados, 'pressure', data_iso)} hPa",
         "lua": fase_lua_por_data(data_iso),
-        "icone": "☀️"
+        "icone": "☀️"  # Ícone fixo
     }
 
 previsao = {
@@ -100,7 +100,6 @@ previsao = {
     "domingo": montar_previsao(data_domingo)
 }
 
-# HTML do card
 def gerar_card(dia, dados):
     return f"""
     <div class="card">
@@ -120,14 +119,14 @@ with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
 
 html_cards = f"""
-{gerar_card("Sábado", previsao['sabado'])}
-{gerar_card("Domingo", previsao['domingo'])}
+<div class="card-container">
+  {gerar_card("Sábado", previsao['sabado'])}
+  {gerar_card("Domingo", previsao['domingo'])}
+</div>
 """
 
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 
-# Salva o HTML final
+# Salva
 with open("index.html", "w", encoding="utf-8") as saida:
     saida.write(html_final)
-
-print("Previsão de pescaria gerada com sucesso!")
