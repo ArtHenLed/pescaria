@@ -17,7 +17,7 @@ dias_ate_domingo = (6 - hoje.weekday()) % 7
 data_sabado = (hoje + timedelta(days=dias_ate_sabado)).strftime("%Y-%m-%d")
 data_domingo = (hoje + timedelta(days=dias_ate_domingo)).strftime("%Y-%m-%d")
 
-# Consulta aos dados climáticos
+# Consulta aos dados climáticos (vento, pressão, temperatura da água)
 weather_response = requests.get(
     "https://api.stormglass.io/v2/weather/point",
     params={
@@ -92,7 +92,7 @@ def montar_previsao(data_iso):
         "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C",
         "pressao": f"{media_por_dia(dados, 'pressure', data_iso)} hPa",
         "lua": fase_lua_por_data(data_iso),
-        "icone": "☀️"  # Sol como placeholder
+        "icone": "☀️"  # Ícone fixo
     }
 
 previsao = {
@@ -100,17 +100,16 @@ previsao = {
     "domingo": montar_previsao(data_domingo)
 }
 
-# Novo layout dos cards com 4 quadrantes (2x2)
 def gerar_card(dia, dados):
     return f"""
     <div class="card">
         <h2>{dia.upper()}<br>{dados['data']}</h2>
         <div class="icon">{dados['icone']}</div>
         <div class="info-grid">
-            <div>Vento<br>{dados['vento']}</div>
-            <div>Temp. água<br>{dados['temp_agua']}</div>
-            <div>Pressão<br>{dados['pressao']}</div>
-            <div>{dados['lua']}</div>
+            <div class="info-box">Vento<br>{dados['vento']}</div>
+            <div class="info-box">Temp. água<br>{dados['temp_agua']}</div>
+            <div class="info-box">Pressão<br>{dados['pressao']}</div>
+            <div class="info-box">{dados['lua']}</div>
         </div>
     </div>
     """
@@ -120,10 +119,8 @@ with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
 
 html_cards = f"""
-<div class="container">
   {gerar_card("Sábado", previsao['sabado'])}
   {gerar_card("Domingo", previsao['domingo'])}
-</div>
 """
 
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
@@ -131,3 +128,5 @@ html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 # Salva
 with open("index.html", "w", encoding="utf-8") as saida:
     saida.write(html_final)
+
+print("Previsão atualizada com sucesso.")
