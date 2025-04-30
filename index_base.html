@@ -1,72 +1,94 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Previsão de Pescaria</title>
-  <style>
-    body {
-      background-color: #0c1d2c;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-    }
-    .logo {
-      margin-top: 20px;
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .slogan {
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-    h1 {
-      font-size: 22px;
-      margin: 10px 0 30px 0;
-    }
-    .cards {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      margin: 0 20px;
-    }
-    .card {
-      background-color: #16324d;
-      border-radius: 12px;
-      padding: 20px;
-      width: 220px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-    .card h2 {
-      font-size: 16px;
-      margin: 0;
-    }
-    .card .data {
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-    .icon {
-      font-size: 32px;
-      margin: 10px 0;
-    }
-    .grid-info {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-gap: 8px;
-      font-size: 13px;
-      text-align: left;
-      margin-top: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Previsão de Pescaria</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #0b1c2c;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+        }
+
+        .logo {
+            margin-top: 20px;
+        }
+
+        .logo img {
+            height: 50px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            background-color: #173144;
+            border-radius: 15px;
+            padding: 20px;
+            width: 240px;
+            height: 320px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .icon {
+            font-size: 36px;
+            margin: 10px 0;
+        }
+
+        .info-box {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .info-box span {
+            background-color: #0f2533;
+            padding: 10px 5px;
+            border-radius: 8px;
+            display: block;
+            line-height: 1.2;
+        }
+
+        @media (max-width: 600px) {
+            .card-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="logo">MIDIAH</div>
-  <div class="slogan">ILUMINANDO IDEIAS</div>
-  <h1>PREVISÃO DE PESCARIA</h1>
-  <div class="cards">
+    <div class="logo">
+        <img src="marcadagua.jpg" alt="Logo">
+    </div>
+    <h1>PREVISÃO DE PESCARIA</h1>
     {{PREVISAO_PESCARIA}}
-  </div>
 </body>
 </html>
