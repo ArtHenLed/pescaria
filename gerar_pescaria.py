@@ -17,7 +17,7 @@ dias_ate_domingo = (6 - hoje.weekday()) % 7
 data_sabado = (hoje + timedelta(days=dias_ate_sabado)).strftime("%Y-%m-%d")
 data_domingo = (hoje + timedelta(days=dias_ate_domingo)).strftime("%Y-%m-%d")
 
-# Consulta aos dados climáticos (vento, pressão, temperatura da água)
+# Consulta aos dados climáticos
 weather_response = requests.get(
     "https://api.stormglass.io/v2/weather/point",
     params={
@@ -89,44 +89,4 @@ def montar_previsao(data_iso):
     return {
         "data": dia.strftime("%d/%m"),
         "vento": f"{media_por_dia(dados, 'windSpeed', data_iso)} km/h",
-        "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C",
-        "pressao": f"{media_por_dia(dados, 'pressure', data_iso)} hPa",
-        "lua": fase_lua_por_data(data_iso),
-        "icone": "☀️"  # Ícone fixo
-    }
-
-previsao = {
-    "sabado": montar_previsao(data_sabado),
-    "domingo": montar_previsao(data_domingo)
-}
-
-def gerar_card(dia, dados):
-    return f"""
-    <div class="card">
-        <h2>{dia.upper()}<br>{dados['data']}</h2>
-        <div class="icon">{dados['icone']}</div>
-        <div class="info-grid">
-            <div class="info-box">Vento<br>{dados['vento']}</div>
-            <div class="info-box">Temp. água<br>{dados['temp_agua']}</div>
-            <div class="info-box">Pressão<br>{dados['pressao']}</div>
-            <div class="info-box">{dados['lua']}</div>
-        </div>
-    </div>
-    """
-
-# Monta HTML final
-with open("index_base.html", "r", encoding="utf-8") as base:
-    html_base = base.read()
-
-html_cards = f"""
-<div class="card-container">
-  {gerar_card("Sábado", previsao['sabado'])}
-  {gerar_card("Domingo", previsao['domingo'])}
-</div>
-"""
-
-html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
-
-# Salva
-with open("index.html", "w", encoding="utf-8") as saida:
-    saida.write(html_final)
+        "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C
