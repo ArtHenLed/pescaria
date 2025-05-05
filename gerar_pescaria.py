@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 LATITUDE = -24.7300
 LONGITUDE = -47.5500
 
-# API Key (armazenada como segredo no GitHub)
+# API Key (armazenada como variável de ambiente)
 API_KEY = os.getenv("STORMGLASS_API_KEY")
 
 # Cálculo das datas do próximo sábado e domingo
@@ -17,7 +17,7 @@ dias_ate_domingo = (6 - hoje.weekday()) % 7
 data_sabado = (hoje + timedelta(days=dias_ate_sabado)).strftime("%Y-%m-%d")
 data_domingo = (hoje + timedelta(days=dias_ate_domingo)).strftime("%Y-%m-%d")
 
-# Consulta aos dados climáticos
+# Requisição para dados climáticos
 weather_response = requests.get(
     "https://api.stormglass.io/v2/weather/point",
     params={
@@ -31,7 +31,7 @@ weather_response = requests.get(
     headers={"Authorization": API_KEY}
 )
 
-# Consulta da fase da lua
+# Requisição para fase da lua
 astro_response = requests.get(
     "https://api.stormglass.io/v2/astronomy/point",
     params={
@@ -43,7 +43,7 @@ astro_response = requests.get(
     headers={"Authorization": API_KEY}
 )
 
-# Tratamento das respostas
+# Verificação básica
 weather_json = weather_response.json()
 astro_json = astro_response.json()
 
@@ -89,4 +89,44 @@ def montar_previsao(data_iso):
     return {
         "data": dia.strftime("%d/%m"),
         "vento": f"{media_por_dia(dados, 'windSpeed', data_iso)} km/h",
-        "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C
+        "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C",
+        "pressao": f"{media_por_dia(dados, 'pressure', data_iso)} hPa",
+        "lua": fase_lua_por_data(data_iso),
+        "icone": "☀️"  # Pode ser dinâmico no futuro
+    }
+
+previsao = {
+    "sabado": montar_previsao(data_sabado),
+    "domingo": montar_previsao(data_domingo)
+}
+
+def gerar_card(dia, dados):
+    return f"""
+    <div class="card">
+        <h2>{dia.upper()}<br>{dados['data']}</h2>
+        <div class="icon">{dados['icone']}</div>
+        <div class="info-grid">
+            <div class="info-box">Vento<br>{dados['vento']}</div>
+            <div class="info-box">Temp. água<br>{dados['temp_agua']}</div>
+            <div class="info-box">Pressão<br>{dados['pressao']}</div>
+            <div class="info-box">{dados['lua']}</div>
+        </div>
+    </div>
+    """
+
+# Gera HTML final com cards dentro da estrutura existente
+with open("index_base.html", "r", encoding="utf-8") as base:
+    html_base = base.read()
+
+html_cards = f"""
+<div class="card-container">
+  {gerar_card("Sábado", previsao['sabado'])}
+  {gerar_card("Domingo", previsao['domingo'])}
+</div>
+"""
+
+html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
+
+# Salva em index.html
+with open("index.html", "w", encoding="utf-8") as saida:
+    saida.write(html_final)
