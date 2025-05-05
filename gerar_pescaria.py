@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 LATITUDE = -24.7300
 LONGITUDE = -47.5500
 
-# API Key (armazenada como variável de ambiente)
+# API Key (armazenada como segredo no GitHub)
 API_KEY = os.getenv("STORMGLASS_API_KEY")
 
 # Cálculo das datas do próximo sábado e domingo
@@ -17,7 +17,7 @@ dias_ate_domingo = (6 - hoje.weekday()) % 7
 data_sabado = (hoje + timedelta(days=dias_ate_sabado)).strftime("%Y-%m-%d")
 data_domingo = (hoje + timedelta(days=dias_ate_domingo)).strftime("%Y-%m-%d")
 
-# Requisição para dados climáticos
+# Consulta aos dados climáticos
 weather_response = requests.get(
     "https://api.stormglass.io/v2/weather/point",
     params={
@@ -31,7 +31,7 @@ weather_response = requests.get(
     headers={"Authorization": API_KEY}
 )
 
-# Requisição para fase da lua
+# Consulta da fase da lua
 astro_response = requests.get(
     "https://api.stormglass.io/v2/astronomy/point",
     params={
@@ -43,7 +43,7 @@ astro_response = requests.get(
     headers={"Authorization": API_KEY}
 )
 
-# Verificação básica
+# Tratamento das respostas
 weather_json = weather_response.json()
 astro_json = astro_response.json()
 
@@ -92,7 +92,7 @@ def montar_previsao(data_iso):
         "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C",
         "pressao": f"{media_por_dia(dados, 'pressure', data_iso)} hPa",
         "lua": fase_lua_por_data(data_iso),
-        "icone": "☀️"  # Pode ser dinâmico no futuro
+        "icone": "☀️"
     }
 
 previsao = {
@@ -114,19 +114,13 @@ def gerar_card(dia, dados):
     </div>
     """
 
-# Gera HTML final com cards dentro da estrutura existente
+# Monta HTML final
 with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
 
-html_cards = f"""
-<div class="card-container">
-  {gerar_card("Sábado", previsao['sabado'])}
-  {gerar_card("Domingo", previsao['domingo'])}
-</div>
-"""
-
+html_cards = gerar_card("Sábado", previsao['sabado']) + gerar_card("Domingo", previsao['domingo'])
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 
-# Salva em index.html
+# Salva resultado
 with open("index.html", "w", encoding="utf-8") as saida:
     saida.write(html_final)
