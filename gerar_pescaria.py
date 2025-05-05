@@ -17,7 +17,7 @@ dias_ate_domingo = (6 - hoje.weekday()) % 7
 data_sabado = (hoje + timedelta(days=dias_ate_sabado)).strftime("%Y-%m-%d")
 data_domingo = (hoje + timedelta(days=dias_ate_domingo)).strftime("%Y-%m-%d")
 
-# Consulta aos dados climáticos
+# Consulta aos dados climáticos (vento, pressão, temperatura da água)
 weather_response = requests.get(
     "https://api.stormglass.io/v2/weather/point",
     params={
@@ -92,7 +92,7 @@ def montar_previsao(data_iso):
         "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C",
         "pressao": f"{media_por_dia(dados, 'pressure', data_iso)} hPa",
         "lua": fase_lua_por_data(data_iso),
-        "icone": "☀️"
+        "icone": "☀️"  # Ícone fixo
     }
 
 previsao = {
@@ -118,9 +118,10 @@ def gerar_card(dia, dados):
 with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
 
+# Apenas os cards (sem container extra), pois já está no HTML base
 html_cards = gerar_card("Sábado", previsao['sabado']) + gerar_card("Domingo", previsao['domingo'])
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 
-# Salva resultado
+# Salva
 with open("index.html", "w", encoding="utf-8") as saida:
     saida.write(html_final)
