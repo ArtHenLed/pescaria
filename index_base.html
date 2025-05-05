@@ -27,4 +27,56 @@
 
     .card-container {
       display: flex;
-      flex-direction
+      flex-direction: row;
+      gap: 100px; /* aumentou o espaço entre os cards */
+    }
+
+    .card {
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 20px;
+      padding: 20px;
+      width: 220px;
+      height: 90%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 5px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .icon {
+      font-size: 48px;
+      margin: 5px 0 15px 0;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .info-box {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 8px;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <img src="marcadagua.jpg" alt="Logotipo" class="logo">
+
+  <div class="card-container">
+    {{PREVISAO_PESCARIA}}
+  </div>
+</body>
+</html>
