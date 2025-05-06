@@ -118,7 +118,7 @@ def gerar_card(dia, dados):
 with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
 
-# Apenas os cards (sem container extra)
+# Apenas os cards (sem container extra, pois já está no HTML base)
 html_cards = gerar_card("Sábado", previsao['sabado']) + gerar_card("Domingo", previsao['domingo'])
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 
