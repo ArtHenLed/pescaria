@@ -100,19 +100,15 @@ def montar_previsao(data_iso):
         "lua": emoji_lua(lua_valor),
         "vento": f"<span class='arrow'>{seta_vento(direcao)}</span><span class='value'> {vento_val}</span><span class='unit'> km/h</span>",
         "temp_linha": (
-            "<span style='color:blue;font-size:30px;'>🔻</span>"
-            f"<span class='value'>{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span>"
-            "<span class='unit'>°C</span> "
-            "<span style='color:red;font-size:30px;'>🔺</span>"
-            f"<span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span>"
+            f"<span style='color:red;font-size:30px;'>🔺 {maximo_por_dia(dados, 'waterTemperature', data_iso)}</span>"
+            "<span class='unit'>°C</span><br>"
+            f"<span style='color:blue;font-size:30px;'>🔽 {minimo_por_dia(dados, 'waterTemperature', data_iso)}</span>"
             "<span class='unit'>°C</span>"
         ),
         "pressao_linha": (
-            "<span style='color:blue;font-size:30px;'>🔻</span>"
-            f"<span class='value'>{minimo_por_dia(dados, 'pressure', data_iso)}</span>"
-            "<span class='unit'>hPa</span> "
-            "<span style='color:red;font-size:30px;'>🔺</span>"
-            f"<span class='value'>{maximo_por_dia(dados, 'pressure', data_iso)}</span>"
+            f"<span style='color:red;font-size:30px;'>🔺 {maximo_por_dia(dados, 'pressure', data_iso)}</span>"
+            "<span class='unit'>hPa</span><br>"
+            f"<span style='color:blue;font-size:30px;'>🔽 {minimo_por_dia(dados, 'pressure', data_iso)}</span>"
             "<span class='unit'>hPa</span>"
         )
     }
