@@ -134,9 +134,9 @@ def montar_previsao(data_iso):
     return {
         "data": dia.strftime("%d/%m"),
         "vento": direcao_vento(data_iso),
-        "agua_min": f"🔻{minimo_por_dia(dados, 'waterTemperature', data_iso)}°C",
+        "agua_min": f"<span style='color:blue'>🔻</span>{minimo_por_dia(dados, 'waterTemperature', data_iso)}°C",
         "agua_max": f"🔺{maximo_por_dia(dados, 'waterTemperature', data_iso)}°C",
-        "pressao_min": f"🔻{minimo_por_dia(dados, 'pressure', data_iso)}hPa",
+        "pressao_min": f"<span style='color:blue'>🔻</span>{minimo_por_dia(dados, 'pressure', data_iso)}hPa",
         "pressao_max": f"🔺{maximo_por_dia(dados, 'pressure', data_iso)}hPa",
         "lua": fase_lua_por_data(data_iso),
         "icone": condicao_clima_por_data(data_iso)
@@ -151,10 +151,9 @@ def gerar_card(dia, dados):
     return f"""
     <div class="card">
         <h2>{dia.upper()}<br>{dados['data']}</h2>
-        <div class="icon">{dados['icone']}</div>
+        <div class="icon-row">{dados['icone']} {dados['lua']}</div>
         <div class="info-grid">
             <div class="info-box">{dados['vento']}</div>
-            <div class="info-box">{dados['lua']}</div>
             <div class="info-box">{dados['agua_min']}</div>
             <div class="info-box">{dados['agua_max']}</div>
             <div class="info-box">{dados['pressao_min']}</div>
