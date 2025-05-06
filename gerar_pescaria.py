@@ -47,15 +47,21 @@ if "hours" not in weather_json or "data" not in astro_json:
 dados = weather_json["hours"]
 dados_lua = astro_json["data"]
 
-def emoji_lua(nome):
-    return {
-        "Lua Nova": "🌑",
-        "Crescente": "🌒",
-        "Quarto Crescente": "🌓",
-        "Lua Cheia": "🌕",
-        "Minguante": "🌘",
-        "Quarto Minguante": "🌗"
-    }.get(nome, "❓")
+def emoji_lua(valor):
+    if valor <= 0.03:
+        return "🌑"
+    elif valor <= 0.24:
+        return "🌒"
+    elif valor <= 0.49:
+        return "🌓"
+    elif valor <= 0.74:
+        return "🌔"
+    elif valor <= 0.97:
+        return "🌖"
+    elif valor < 1:
+        return "🌗"
+    else:
+        return "🌕"
 
 def seta_vento(angulo):
     if angulo is None:
@@ -81,66 +87,33 @@ def maximo_por_dia(dados, campo, data_alvo):
     valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
     return round(max(valores), 1) if valores else 0
 
-def fase_lua(valor):
-    if valor < 0.1 or valor > 0.9:
-        return "Lua Nova"
-    elif 0.1 <= valor < 0.25:
-        return "Crescente"
-    elif 0.25 <= valor < 0.5:
-        return "Quarto Crescente"
-    elif 0.5 <= valor < 0.75:
-        return "Lua Cheia"
-    elif 0.75 <= valor <= 0.9:
-        return "Minguante"
-    else:
-        return "Quarto Minguante"
-
-def fase_lua_por_data(data_alvo):
-    for d in dados_lua:
-        if d["time"].startswith(data_alvo):
-            valor = d["moonPhase"]
-            if isinstance(valor, dict):
-                valor = valor.get("noaa", 0)
-            nome_fase = fase_lua(valor)
-            return emoji_lua(nome_fase)
-    return "❓"
-
-def condicao_clima_por_data(data_alvo):
-    icones_dia = []
-    for hora in dados:
-        if hora["time"].startswith(data_alvo):
-            nuvens = hora.get("cloudCover", {}).get("noaa", 0)
-            chuva = hora.get("precipitation", {}).get("noaa", 0)
-            if chuva > 1:
-                icones_dia.append("🌧️")
-            elif nuvens > 70:
-                icones_dia.append("☁️")
-            elif nuvens > 30:
-                icones_dia.append("⛅")
-            else:
-                icones_dia.append("☀️")
-    return max(set(icones_dia), key=icones_dia.count) if icones_dia else "❓"
-
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
     vento_val = media_por_dia(dados, "windSpeed", data_iso)
     direcao = next((hora["windDirection"]["noaa"] for hora in dados if hora["time"].startswith(data_iso)), None)
+    lua_valor = next((d["moonPhase"] for d in dados_lua if d["time"].startswith(data_iso)), None)
+    if isinstance(lua_valor, dict):
+        lua_valor = lua_valor.get("noaa", 0)
     return {
         "data": dia.strftime("%d/%m"),
-        "icone": condicao_clima_por_data(data_iso),
-        "lua": fase_lua_por_data(data_iso),
-        "vento": f"{seta_vento(direcao)} {vento_val} km/h",
+        "icone": "☀️",
+        "lua": emoji_lua(lua_valor),
+        "vento": f"<span class='arrow'>{seta_vento(direcao)}</span><span class='value'> {vento_val}</span><span class='unit'> km/h</span>",
         "temp_linha": (
-            f"<span style='color:blue;font-size:24px;'>🔻{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span>"
-            f"<span style='font-size:10px;'>°C</span> "
-            f"<span style='color:red;font-size:24px;'>🔺{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span>"
-            f"<span style='font-size:10px;'>°C</span>"
+            "<span style='color:blue;font-size:30px;'>🔻</span>"
+            f"<span class='value'>{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span>"
+            "<span class='unit'>°C</span> "
+            "<span style='color:red;font-size:30px;'>🔺</span>"
+            f"<span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span>"
+            "<span class='unit'>°C</span>"
         ),
         "pressao_linha": (
-            f"<span style='color:blue;font-size:24px;'>🔻{minimo_por_dia(dados, 'pressure', data_iso)}</span>"
-            f"<span style='font-size:10px;'>hPa</span> "
-            f"<span style='color:red;font-size:24px;'>🔺{maximo_por_dia(dados, 'pressure', data_iso)}</span>"
-            f"<span style='font-size:10px;'>hPa</span>"
+            "<span style='color:blue;font-size:30px;'>🔻</span>"
+            f"<span class='value'>{minimo_por_dia(dados, 'pressure', data_iso)}</span>"
+            "<span class='unit'>hPa</span> "
+            "<span style='color:red;font-size:30px;'>🔺</span>"
+            f"<span class='value'>{maximo_por_dia(dados, 'pressure', data_iso)}</span>"
+            "<span class='unit'>hPa</span>"
         )
     }
 
@@ -150,17 +123,13 @@ previsao = {
 }
 
 def gerar_card(dia, dados):
-    return f"""
-    <div class="card">
+    return f"""<div class="card">
         <h2>{dia.upper()}<br>{dados['data']}</h2>
-        <div class="icon-row">{dados['icone']} {dados['lua']}</div>
-        <div class="info-grid">
-            <div class="info-box" style="grid-column: span 2;">{dados['vento']}</div>
-            <div class="info-box" style="grid-column: span 2;">{dados['temp_linha']}</div>
-            <div class="info-box" style="grid-column: span 2;">{dados['pressao_linha']}</div>
-        </div>
-    </div>
-    """
+        <div class="icon">{dados['icone']} {dados['lua']}</div>
+        <div class="line">{dados['vento']}</div>
+        <div class="line">{dados['temp_linha']}</div>
+        <div class="line">{dados['pressao_linha']}</div>
+    </div>"""
 
 with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
