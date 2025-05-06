@@ -28,7 +28,15 @@
     .card-container {
       display: flex;
       flex-direction: row;
-      gap: 100px; /* aumentou o espaço entre os cards */
+      justify-content: center;
+    }
+
+    .card:first-child {
+      margin-right: 50px;
+    }
+
+    .card:last-child {
+      margin-left: 50px;
     }
 
     .card {
