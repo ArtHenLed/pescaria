@@ -40,39 +40,43 @@
     }
 
     .card {
-      background-color: rgba(255, 255, 255, 0.85);
+      background-color: rgba(255, 255, 255, 0.5);
       border-radius: 20px;
       padding: 20px;
       width: 220px;
-      height: 90%;
+      height: auto;
       text-align: center;
       display: flex;
       flex-direction: column;
-      justify-content: start;
+      align-items: center;
       color: black;
     }
 
     .card h2 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-size: 18px;
+      margin: 0 0 6px 0;
+      font-size: 20px;
     }
 
-    .icon {
-      font-size: 48px;
-      margin: 5px 0 10px 0;
+    .icon-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 36px;
+      margin-bottom: 10px;
     }
 
     .info-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 6px;
+      justify-items: center;
     }
 
     .info-box {
-      background-color: rgba(0, 0, 0, 0.05);
-      padding: 8px;
-      border-radius: 10px;
+      background: none;
+      padding: 4px;
+      border-radius: 0;
       font-size: 18px;
       font-weight: bold;
       color: black;
