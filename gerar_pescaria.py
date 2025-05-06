@@ -42,8 +42,6 @@ astro_json = astro_response.json()
 
 if "hours" not in weather_json or "data" not in astro_json:
     print("Erro ao obter dados da API")
-    print("Weather JSON:", weather_json)
-    print("Astro JSON:", astro_json)
     exit(1)
 
 dados = weather_json["hours"]
@@ -123,23 +121,27 @@ def condicao_clima_por_data(data_alvo):
                 icones_dia.append("☀️")
     return max(set(icones_dia), key=icones_dia.count) if icones_dia else "❓"
 
-def direcao_vento(data_alvo):
-    for hora in dados:
-        if hora["time"].startswith(data_alvo):
-            return seta_vento(hora.get("windDirection", {}).get("noaa"))
-    return "❓"
-
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
+    vento_val = media_por_dia(dados, "windSpeed", data_iso)
+    direcao = next((hora["windDirection"]["noaa"] for hora in dados if hora["time"].startswith(data_iso)), None)
     return {
         "data": dia.strftime("%d/%m"),
-        "vento": direcao_vento(data_iso),
-        "agua_min": f"<span style='color:blue'>🔻</span>{minimo_por_dia(dados, 'waterTemperature', data_iso)}°C",
-        "agua_max": f"🔺{maximo_por_dia(dados, 'waterTemperature', data_iso)}°C",
-        "pressao_min": f"<span style='color:blue'>🔻</span>{minimo_por_dia(dados, 'pressure', data_iso)}hPa",
-        "pressao_max": f"🔺{maximo_por_dia(dados, 'pressure', data_iso)}hPa",
+        "icone": condicao_clima_por_data(data_iso),
         "lua": fase_lua_por_data(data_iso),
-        "icone": condicao_clima_por_data(data_iso)
+        "vento": f"{seta_vento(direcao)} {vento_val} km/h",
+        "temp_linha": (
+            f"<span style='color:blue;font-size:24px;'>🔻{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span>"
+            f"<span style='font-size:10px;'>°C</span> "
+            f"<span style='color:red;font-size:24px;'>🔺{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span>"
+            f"<span style='font-size:10px;'>°C</span>"
+        ),
+        "pressao_linha": (
+            f"<span style='color:blue;font-size:24px;'>🔻{minimo_por_dia(dados, 'pressure', data_iso)}</span>"
+            f"<span style='font-size:10px;'>hPa</span> "
+            f"<span style='color:red;font-size:24px;'>🔺{maximo_por_dia(dados, 'pressure', data_iso)}</span>"
+            f"<span style='font-size:10px;'>hPa</span>"
+        )
     }
 
 previsao = {
@@ -153,11 +155,9 @@ def gerar_card(dia, dados):
         <h2>{dia.upper()}<br>{dados['data']}</h2>
         <div class="icon-row">{dados['icone']} {dados['lua']}</div>
         <div class="info-grid">
-            <div class="info-box">{dados['vento']}</div>
-            <div class="info-box">{dados['agua_min']}</div>
-            <div class="info-box">{dados['agua_max']}</div>
-            <div class="info-box">{dados['pressao_min']}</div>
-            <div class="info-box">{dados['pressao_max']}</div>
+            <div class="info-box" style="grid-column: span 2;">{dados['vento']}</div>
+            <div class="info-box" style="grid-column: span 2;">{dados['temp_linha']}</div>
+            <div class="info-box" style="grid-column: span 2;">{dados['pressao_linha']}</div>
         </div>
     </div>
     """
@@ -165,7 +165,7 @@ def gerar_card(dia, dados):
 with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
 
-html_cards = gerar_card("Sábado", previsao['sabado']) + gerar_card("Domingo", previsao['domingo'])
+html_cards = gerar_card("Sábado", previsao["sabado"]) + gerar_card("Domingo", previsao["domingo"])
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 
 with open("index.html", "w", encoding="utf-8") as saida:
