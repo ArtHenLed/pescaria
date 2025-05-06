@@ -2,14 +2,10 @@ import os
 import requests
 from datetime import datetime, timedelta
 
-# Coordenadas de Ilha Comprida
 LATITUDE = -24.7300
 LONGITUDE = -47.5500
-
-# API Key (armazenada como segredo no GitHub)
 API_KEY = os.getenv("STORMGLASS_API_KEY")
 
-# Cálculo das datas do próximo sábado e domingo
 hoje = datetime.utcnow()
 dias_ate_sabado = (5 - hoje.weekday()) % 7
 dias_ate_domingo = (6 - hoje.weekday()) % 7
@@ -17,13 +13,12 @@ dias_ate_domingo = (6 - hoje.weekday()) % 7
 data_sabado = (hoje + timedelta(days=dias_ate_sabado)).strftime("%Y-%m-%d")
 data_domingo = (hoje + timedelta(days=dias_ate_domingo)).strftime("%Y-%m-%d")
 
-# Consulta aos dados climáticos (vento, pressão, temperatura da água)
 weather_response = requests.get(
     "https://api.stormglass.io/v2/weather/point",
     params={
         "lat": LATITUDE,
         "lng": LONGITUDE,
-        "params": "waterTemperature,windSpeed,windDirection,pressure",
+        "params": "waterTemperature,windSpeed,windDirection,pressure,cloudCover,precipitation",
         "start": f"{data_sabado}T00:00:00+00:00",
         "end": f"{data_domingo}T23:59:59+00:00",
         "source": "noaa"
@@ -31,7 +26,6 @@ weather_response = requests.get(
     headers={"Authorization": API_KEY}
 )
 
-# Consulta da fase da lua
 astro_response = requests.get(
     "https://api.stormglass.io/v2/astronomy/point",
     params={
@@ -43,7 +37,6 @@ astro_response = requests.get(
     headers={"Authorization": API_KEY}
 )
 
-# Tratamento das respostas
 weather_json = weather_response.json()
 astro_json = astro_response.json()
 
@@ -56,10 +49,39 @@ if "hours" not in weather_json or "data" not in astro_json:
 dados = weather_json["hours"]
 dados_lua = astro_json["data"]
 
-# Funções auxiliares
+def emoji_lua(nome):
+    return {
+        "Lua Nova": "🌑",
+        "Crescente": "🌒",
+        "Quarto Crescente": "🌓",
+        "Lua Cheia": "🌕",
+        "Minguante": "🌘",
+        "Quarto Minguante": "🌗"
+    }.get(nome, "❓")
+
+def seta_vento(angulo):
+    if angulo is None:
+        return "❓"
+    direcoes = [
+        (0, "⬇️"), (45, "↙️"), (90, "⬅️"), (135, "↖️"),
+        (180, "⬆️"), (225, "↗️"), (270, "➡️"), (315, "↘️"), (360, "⬇️")
+    ]
+    for i in range(len(direcoes) - 1):
+        if direcoes[i][0] <= angulo < direcoes[i + 1][0]:
+            return direcoes[i][1]
+    return "❓"
+
 def media_por_dia(dados, campo, data_alvo):
     valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
     return round(sum(valores) / len(valores), 1) if valores else 0
+
+def minimo_por_dia(dados, campo, data_alvo):
+    valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
+    return round(min(valores), 1) if valores else 0
+
+def maximo_por_dia(dados, campo, data_alvo):
+    valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
+    return round(max(valores), 1) if valores else 0
 
 def fase_lua(valor):
     if valor < 0.1 or valor > 0.9:
@@ -81,18 +103,43 @@ def fase_lua_por_data(data_alvo):
             valor = d["moonPhase"]
             if isinstance(valor, dict):
                 valor = valor.get("noaa", 0)
-            return fase_lua(valor)
-    return "Desconhecida"
+            nome_fase = fase_lua(valor)
+            return emoji_lua(nome_fase)
+    return "❓"
+
+def condicao_clima_por_data(data_alvo):
+    icones_dia = []
+    for hora in dados:
+        if hora["time"].startswith(data_alvo):
+            nuvens = hora.get("cloudCover", {}).get("noaa", 0)
+            chuva = hora.get("precipitation", {}).get("noaa", 0)
+            if chuva > 1:
+                icones_dia.append("🌧️")
+            elif nuvens > 70:
+                icones_dia.append("☁️")
+            elif nuvens > 30:
+                icones_dia.append("⛅")
+            else:
+                icones_dia.append("☀️")
+    return max(set(icones_dia), key=icones_dia.count) if icones_dia else "❓"
+
+def direcao_vento(data_alvo):
+    for hora in dados:
+        if hora["time"].startswith(data_alvo):
+            return seta_vento(hora.get("windDirection", {}).get("noaa"))
+    return "❓"
 
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
     return {
         "data": dia.strftime("%d/%m"),
-        "vento": f"{media_por_dia(dados, 'windSpeed', data_iso)} km/h",
-        "temp_agua": f"{media_por_dia(dados, 'waterTemperature', data_iso)} °C",
-        "pressao": f"{media_por_dia(dados, 'pressure', data_iso)} hPa",
+        "vento": direcao_vento(data_iso),
+        "agua_min": f"🔻{minimo_por_dia(dados, 'waterTemperature', data_iso)}°C",
+        "agua_max": f"🔺{maximo_por_dia(dados, 'waterTemperature', data_iso)}°C",
+        "pressao_min": f"🔻{minimo_por_dia(dados, 'pressure', data_iso)}hPa",
+        "pressao_max": f"🔺{maximo_por_dia(dados, 'pressure', data_iso)}hPa",
         "lua": fase_lua_por_data(data_iso),
-        "icone": "☀️"  # Ícone fixo
+        "icone": condicao_clima_por_data(data_iso)
     }
 
 previsao = {
@@ -106,22 +153,21 @@ def gerar_card(dia, dados):
         <h2>{dia.upper()}<br>{dados['data']}</h2>
         <div class="icon">{dados['icone']}</div>
         <div class="info-grid">
-            <div class="info-box">Vento<br>{dados['vento']}</div>
-            <div class="info-box">Temp. água<br>{dados['temp_agua']}</div>
-            <div class="info-box">Pressão<br>{dados['pressao']}</div>
+            <div class="info-box">{dados['vento']}</div>
             <div class="info-box">{dados['lua']}</div>
+            <div class="info-box">{dados['agua_min']}</div>
+            <div class="info-box">{dados['agua_max']}</div>
+            <div class="info-box">{dados['pressao_min']}</div>
+            <div class="info-box">{dados['pressao_max']}</div>
         </div>
     </div>
     """
 
-# Monta HTML final
 with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
 
-# Apenas os cards (sem container extra, pois já está no HTML base)
 html_cards = gerar_card("Sábado", previsao['sabado']) + gerar_card("Domingo", previsao['domingo'])
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 
-# Salva
 with open("index.html", "w", encoding="utf-8") as saida:
     saida.write(html_final)
