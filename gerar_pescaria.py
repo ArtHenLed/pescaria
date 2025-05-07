@@ -90,7 +90,6 @@ def maximo_por_dia(dados, campo, data_alvo):
 def icone_clima(data_iso):
     nuvens = media_por_dia(dados, "cloudCover", data_iso)
     chuva = media_por_dia(dados, "precipitation", data_iso)
-
     if chuva > 2.0:
         return "🌧️"
     elif nuvens > 70:
@@ -128,13 +127,15 @@ previsao = {
 }
 
 def gerar_card(dia, dados):
-    return f"""<div class="card">
-        <h2>{dia.upper()}<br>{dados['data']}</h2>
-        <div class="icon">{dados['icone']} {dados['lua']}</div>
-        <div class="line">{dados['vento']}</div>
-        <div class="line">{dados['temp_linha']}</div>
-        <div class="line">{dados['pressao_linha']}</div>
-    </div>"""
+    html = []
+    html.append(f'<div class="card">')
+    html.append(f'  <h2>{dia.upper()}<br>{dados["data"]}</h2>')
+    html.append(f'  <div class="icon">{dados["icone"]} {dados["lua"]}</div>')
+    html.append(f'  <div class="line">{dados["vento"]}</div>')
+    html.append(f'  <div class="line">{dados["temp_linha"]}</div>')
+    html.append(f'  <div class="line">{dados["pressao_linha"]}</div>')
+    html.append(f'</div>')
+    return "\n".join(html)
 
 with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
