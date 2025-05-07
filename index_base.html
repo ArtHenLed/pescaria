@@ -54,24 +54,30 @@
       margin: 5px 0;
     }
 
-    .icon {
+    .icon-row {
       font-size: 18px;
       margin: 5px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
     }
 
-    .line {
-      margin: 5px 0;
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    .info-box {
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       font-size: 13px;
-      color: black;
-    }
-
-    .line span {
-      display: inline-block;
-      color: black;
+      flex-direction: column;
+      text-align: center;
     }
 
     .arrow {
@@ -80,10 +86,12 @@
 
     .value {
       font-size: 21px;
+      color: black;
     }
 
     .unit {
       font-size: 13px;
+      color: black;
     }
   </style>
 </head>
