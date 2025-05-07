@@ -54,30 +54,29 @@
       margin: 5px 0;
     }
 
-    .icon-row {
-      font-size: 18px;
+    .icon {
+      margin: 5px 0;
+    }
+
+    .icon img {
+      width: 24px;
+      height: 24px;
+      margin: 0 2px;
+    }
+
+    .line {
       margin: 5px 0;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 4px;
-      width: 100%;
-      margin-top: 5px;
-    }
-
-    .info-box {
-      display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       font-size: 13px;
-      flex-direction: column;
-      text-align: center;
+      color: black;
+    }
+
+    .line span {
+      display: inline-block;
+      color: black;
     }
 
     .arrow {
@@ -86,12 +85,15 @@
 
     .value {
       font-size: 21px;
-      color: black;
     }
 
     .unit {
       font-size: 13px;
-      color: black;
+    }
+
+    .line img {
+      vertical-align: middle;
+      margin-right: 4px;
     }
   </style>
 </head>
