@@ -54,30 +54,29 @@
       margin: 5px 0;
     }
 
-    .icon-row {
-      font-size: 18px;
+    .icon {
+      margin: 5px 0;
+    }
+
+    .icon img {
+      width: 24px;
+      height: 24px;
+      margin: 0 2px;
+    }
+
+    .line {
       margin: 5px 0;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 4px;
-      width: 100%;
-      margin-top: 5px;
-    }
-
-    .info-box {
-      display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       font-size: 13px;
-      flex-direction: column;
-      text-align: center;
+      color: black;
+    }
+
+    .line span {
+      display: inline-block;
+      color: black;
     }
 
     .arrow {
@@ -86,12 +85,15 @@
 
     .value {
       font-size: 21px;
-      color: black;
     }
 
     .unit {
       font-size: 13px;
-      color: black;
+    }
+
+    .line img {
+      vertical-align: middle;
+      margin-right: 4px;
     }
   </style>
 </head>
@@ -102,21 +104,17 @@
 
   <div class="cards-container">
     <div class="card">
-        <h2>SÃ¡BADO<br>10/05</h2>
-        <div class="icon-row"><img src='chuva_com_trovoada.png' width='18' height='18'/> <img src='lua_00.png' width='18' height='18'/></div>
-        <div class="info-grid">
-            <div class="info-box" style="grid-column: span 2;"><span class='arrow'>â¬‡ï¸</span><span class='value'> 1.6</span><span class='unit'> km/h</span></div>
-            <div class="info-box" style="grid-column: span 2;"><img src='seta_vermelha.png' width='17' height='17' style='vertical-align:middle;'/><span class='value'>23.9</span><span class='unit'>Â°C</span><br><img src='seta_azul.png' width='17' height='17' style='vertical-align:middle;'/><span class='value'>21.1</span><span class='unit'>Â°C</span></div>
-            <div class="info-box" style="grid-column: span 2;"><img src='seta_vermelha.png' width='17' height='17' style='vertical-align:middle;'/><span class='value'>1018.7</span><span class='unit'>hPa</span><br><img src='seta_azul.png' width='17' height='17' style='vertical-align:middle;'/><span class='value'>1011.2</span><span class='unit'>hPa</span></div>
-        </div>
+        <h2>SÁBADO<br>10/05</h2>
+        <div class="icon"><img src="sol e nublado.png" width="24px"/> <img src="lua nova.png" width="24px"/></div>
+        <div class="line"><span class='arrow'>⬇️</span> 1.6 <span class='unit'>km/h</span></div>
+        <div class="line"><img src='seta cima.png' width='14px'/> <span class='value'>23.9</span> <span class='unit'>°C</span><br><img src='seta baixo.png' width='14px'/> <span class='value'>21.1</span> <span class='unit'>°C</span></div>
+        <div class="line"><img src='seta cima.png' width='14px'/> <span class='value'>1018.7</span> <span class='unit'>hPa</span><br><img src='seta baixo.png' width='14px'/> <span class='value'>1011.2</span> <span class='unit'>hPa</span></div>
     </div><div class="card">
         <h2>DOMINGO<br>11/05</h2>
-        <div class="icon-row"><img src='nublado.png' width='18' height='18'/> <img src='lua_00.png' width='18' height='18'/></div>
-        <div class="info-grid">
-            <div class="info-box" style="grid-column: span 2;"><span class='arrow'>â†–ï¸</span><span class='value'> 1.9</span><span class='unit'> km/h</span></div>
-            <div class="info-box" style="grid-column: span 2;"><img src='seta_vermelha.png' width='17' height='17' style='vertical-align:middle;'/><span class='value'>23.4</span><span class='unit'>Â°C</span><br><img src='seta_azul.png' width='17' height='17' style='vertical-align:middle;'/><span class='value'>19.1</span><span class='unit'>Â°C</span></div>
-            <div class="info-box" style="grid-column: span 2;"><img src='seta_vermelha.png' width='17' height='17' style='vertical-align:middle;'/><span class='value'>1023.5</span><span class='unit'>hPa</span><br><img src='seta_azul.png' width='17' height='17' style='vertical-align:middle;'/><span class='value'>1019.2</span><span class='unit'>hPa</span></div>
-        </div>
+        <div class="icon"><img src="nublado.png" width="24px"/> <img src="lua nova.png" width="24px"/></div>
+        <div class="line"><span class='arrow'>↖️</span> 1.9 <span class='unit'>km/h</span></div>
+        <div class="line"><img src='seta cima.png' width='14px'/> <span class='value'>23.4</span> <span class='unit'>°C</span><br><img src='seta baixo.png' width='14px'/> <span class='value'>19.1</span> <span class='unit'>°C</span></div>
+        <div class="line"><img src='seta cima.png' width='14px'/> <span class='value'>1023.5</span> <span class='unit'>hPa</span><br><img src='seta baixo.png' width='14px'/> <span class='value'>1019.2</span> <span class='unit'>hPa</span></div>
     </div>
   </div>
 </body>
