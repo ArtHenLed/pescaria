@@ -87,6 +87,19 @@ def maximo_por_dia(dados, campo, data_alvo):
     valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
     return round(max(valores), 1) if valores else 0
 
+def icone_clima(data_iso):
+    nuvens = media_por_dia(dados, "cloudCover", data_iso)
+    chuva = media_por_dia(dados, "precipitation", data_iso)
+
+    if chuva > 2.0:
+        return "🌧️"
+    elif nuvens > 70:
+        return "☁️"
+    elif nuvens > 30:
+        return "🌤️"
+    else:
+        return "☀️"
+
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
     vento_val = media_por_dia(dados, "windSpeed", data_iso)
@@ -96,7 +109,7 @@ def montar_previsao(data_iso):
         lua_valor = lua_valor.get("noaa", 0)
     return {
         "data": dia.strftime("%d/%m"),
-        "icone": "☀️",
+        "icone": icone_clima(data_iso),
         "lua": emoji_lua(lua_valor),
         "vento": f"<span style='font-size:21px; color:black;'>{seta_vento(direcao)} {vento_val} km/h</span>",
         "temp_linha": (
