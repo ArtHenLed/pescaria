@@ -2,11 +2,14 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=576, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Previsão de Pescaria</title>
   <style>
     body {
       margin: 0;
+      width: 576px;
+      height: 384px;
+      overflow: hidden;
       font-family: Arial, sans-serif;
       background-image: url('FOTOFUNDOPESCA_576x384.jpg');
       background-size: cover;
@@ -21,21 +24,21 @@
     }
 
     .logo img {
-      height: 60px;
+      height: 40px;
     }
 
     .cards-container {
       display: flex;
       justify-content: center;
-      gap: 100px;
-      margin-top: 30px;
+      gap: 40px;
+      margin-top: 20px;
     }
 
     .card {
       background-color: rgba(255, 255, 255, 0.5);
       border-radius: 15px;
-      padding: 10px;
-      width: 200px;
+      padding: 5px;
+      width: 150px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -43,12 +46,12 @@
     }
 
     h2 {
-      font-size: 30px;
+      font-size: 21px;
       margin: 5px 0;
     }
 
     .icon {
-      font-size: 26px;
+      font-size: 18px;
       margin: 5px 0;
     }
 
@@ -58,7 +61,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      font-size: 18px;
+      font-size: 13px;
       color: black;
     }
 
@@ -68,15 +71,15 @@
     }
 
     .arrow {
-      font-size: 24px;
+      font-size: 17px;
     }
 
     .value {
-      font-size: 30px;
+      font-size: 21px;
     }
 
     .unit {
-      font-size: 18px;
+      font-size: 13px;
     }
   </style>
 </head>
@@ -89,15 +92,15 @@
     <div class="card">
         <h2>SÁBADO<br>10/05</h2>
         <div class="icon">☀️ 🌑</div>
-        <div class="line"><span style='font-size:30px; color:black;'>⬇️ 1.6 km/h</span></div>
-        <div class="line"><span style='font-size:30px; color:black;'>🔺 23.9°C</span><br><span style='font-size:30px; color:black;'>🔽 21.1°C</span></div>
-        <div class="line"><span style='font-size:30px; color:black;'>🔺 1018.7 hPa</span><br><span style='font-size:30px; color:black;'>🔽 1011.2 hPa</span></div>
+        <div class="line"><span style='font-size:21px; color:black;'>⬇️ 1.6 km/h</span></div>
+        <div class="line"><span style='font-size:21px; color:black;'>🔺 23.9°C</span><br><span style='font-size:21px; color:black;'>🔽 21.1°C</span></div>
+        <div class="line"><span style='font-size:21px; color:black;'>🔺 1018.7 hPa</span><br><span style='font-size:21px; color:black;'>🔽 1011.2 hPa</span></div>
     </div><div class="card">
         <h2>DOMINGO<br>11/05</h2>
         <div class="icon">☀️ 🌑</div>
-        <div class="line"><span style='font-size:30px; color:black;'>↖️ 1.9 km/h</span></div>
-        <div class="line"><span style='font-size:30px; color:black;'>🔺 23.4°C</span><br><span style='font-size:30px; color:black;'>🔽 19.1°C</span></div>
-        <div class="line"><span style='font-size:30px; color:black;'>🔺 1023.5 hPa</span><br><span style='font-size:30px; color:black;'>🔽 1019.2 hPa</span></div>
+        <div class="line"><span style='font-size:21px; color:black;'>↖️ 1.9 km/h</span></div>
+        <div class="line"><span style='font-size:21px; color:black;'>🔺 23.4°C</span><br><span style='font-size:21px; color:black;'>🔽 19.1°C</span></div>
+        <div class="line"><span style='font-size:21px; color:black;'>🔺 1023.5 hPa</span><br><span style='font-size:21px; color:black;'>🔽 1019.2 hPa</span></div>
     </div>
   </div>
 </body>
