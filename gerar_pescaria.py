@@ -55,25 +55,23 @@ def icone_clima(prec, cloud):
         return "nublado.png"
     elif cloud > 50:
         return "sol e nublado.png"
-    elif prec > 0.5:
-        return "sol e chuva.png"
     else:
         return "sol.png"
 
 def icone_lua(fase):
-    if fase < 0.03:
+    if fase is None:
         return "lua nova.png"
-    elif fase < 0.22:
+    elif fase < 0.06:
+        return "lua nova.png"
+    elif fase < 0.24:
         return "lua crescente.png"
-    elif fase < 0.28:
+    elif fase < 0.49:
         return "lua quarto crescente.png"
-    elif fase < 0.47:
-        return "lua gibosa crescente.png"
-    elif fase < 0.53:
+    elif fase < 0.51:
         return "lua cheia.png"
-    elif fase < 0.72:
+    elif fase < 0.74:
         return "lua gibosa minguante.png"
-    elif fase < 0.78:
+    elif fase < 0.94:
         return "lua quarto minguante.png"
     else:
         return "lua minguante.png"
@@ -113,7 +111,7 @@ def montar_previsao(data_iso):
         "data": dia.strftime("%d/%m"),
         "icone": icone_clima(prec, cloud),
         "lua": icone_lua(lua_valor),
-        "vento": f"<div><span class='arrow'>{seta_vento(direcao)}</span> <span class='value'>{vento_val}</span> <span class='unit'>km/h</span></div>",
+        "vento": f"<span class='arrow'>{seta_vento(direcao)}</span> <span class='value'>{vento_val}</span> <span class='unit'>km/h</span>",
         "temp_linha": (
             f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
             f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
@@ -139,4 +137,10 @@ def gerar_card(dia, dados):
     </div>"""
 
 with open("index_base.html", "r", encoding="utf-8") as base:
-    html_base = base.read
+    html_base = base.read()
+
+html_cards = gerar_card("Sábado", previsao["sabado"]) + gerar_card("Domingo", previsao["domingo"])
+html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
+
+with open("index.html", "w", encoding="utf-8") as saida:
+    saida.write(html_final)
