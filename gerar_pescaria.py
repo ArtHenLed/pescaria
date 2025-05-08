@@ -61,22 +61,24 @@ def icone_clima(prec, cloud):
 def icone_lua(fase):
     if fase is None:
         return "lua desconhecida.png"
-    elif fase >= 0.97 or fase < 0.03:
+    elif 0.00 <= fase < 0.03 or 0.97 <= fase <= 1.00:
         return "lua nova.png"
-    elif fase < 0.22:
+    elif 0.03 <= fase < 0.22:
         return "lua crescente.png"
-    elif fase < 0.28:
+    elif 0.22 <= fase < 0.28:
         return "lua quarto crescente.png"
-    elif fase < 0.47:
+    elif 0.28 <= fase < 0.47:
         return "lua gibosa crescente.png"
-    elif fase < 0.53:
+    elif 0.47 <= fase < 0.53:
         return "lua cheia.png"
-    elif fase < 0.72:
+    elif 0.53 <= fase < 0.72:
         return "lua gibosa minguante.png"
-    elif fase < 0.78:
+    elif 0.72 <= fase < 0.78:
         return "lua quarto minguante.png"
-    else:
+    elif 0.78 <= fase < 0.97:
         return "lua minguante.png"
+    else:
+        return "lua desconhecida.png"  # segurança extra para valores fora de 0-1
 
 def seta_vento(angulo):
     if angulo is None:
