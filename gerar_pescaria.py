@@ -70,7 +70,7 @@ def icone_lua(data_str):
         "lua minguante.png"
     ]
     # Data de referência: Quarto Minguante em 20/05/2025 às 08:58 UTC
-    data_fase_conhecida = datetime(2025, 5, 20, 8, 58)
+    data_fase_conhecida = datetime(2025, 4, 29, 6, 0)
     ciclo_lunar_dias = 29 + 12 / 24 + 44 / 1440  # 29 dias, 12h, 44min
 
     data_alvo = datetime.strptime(data_str, "%Y-%m-%d")
