@@ -113,7 +113,7 @@ def maximo_por_dia(dados, campo, data_alvo):
 def pegar_mares(data_iso, tipo):
     eventos = [e for e in tide_json["data"] if e["type"] == tipo and e["time"].startswith(data_iso)]
     mares = []
-    for evento in eventos[:2]:  # até 2 por tipo
+    for evento in eventos[:2]:
         hora = datetime.strptime(evento["time"], "%Y-%m-%dT%H:%M:%S+00:00")
         mares.append(hora.strftime("%H:%M"))
     while len(mares) < 2:
@@ -161,17 +161,16 @@ def gerar_card(dia, dados):
             <div class="col-dir">
                 <div class="icon-line"><img src="{dados['lua']}" width="35px" height="35px"/></div>
                 <div class="mare-linha"><img src='seta cima.png' width='14px' height='14px'/> maré</div>
-               <div class="mare-linha"><img src='seta cima.png' width='14px' height='14px'/> maré</div>
-<div class="hora-mare-dupla">
-  <span>{dados['mares_altas'][0]}</span>
-  <span>{dados['mares_altas'][1]}</span>
-</div>
-<div class="mare-linha"><img src='seta baixo.png' width='14px' height='14px'/> maré</div>
-<div class="hora-mare-dupla">
-  <span>{dados['mares_baixas'][0]}</span>
-  <span>{dados['mares_baixas'][1]}</span>
-</div>
-
+                <div class="hora-mare-dupla">
+                  <span>{dados['mares_altas'][0]}</span>
+                  <span>{dados['mares_altas'][1]}</span>
+                </div>
+                <div class="mare-linha"><img src='seta baixo.png' width='14px' height='14px'/> maré</div>
+                <div class="hora-mare-dupla">
+                  <span>{dados['mares_baixas'][0]}</span>
+                  <span>{dados['mares_baixas'][1]}</span>
+                </div>
+            </div>
         </div>
     </div>"""
 
