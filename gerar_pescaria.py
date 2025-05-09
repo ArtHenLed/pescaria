@@ -134,7 +134,7 @@ previsao = {
 def gerar_card(dia, dados):
     return f"""<div class="card">
         <h2>{dia.upper()}<br>{dados['data']}</h2>
-        <div class="icon-line"><img src="{dados['icone']}" width="35px" height="35px"/> <img src="{dados['lua']}" width="35px" height="35px"/></div>
+        <div class="icon-line"><img src="{dados['icone']}" width="30px" height="35px"/> <img src="{dados['lua']}" width="30px" height="35px"/></div>
         <div class="line">{dados['vento']}</div>
         <div class="line">{dados['temp_linha']}</div>
         <div class="line">{dados['pressao_linha']}</div>
