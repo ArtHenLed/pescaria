@@ -110,12 +110,15 @@ def maximo_por_dia(dados, campo, data_alvo):
     valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
     return round(max(valores), 1) if valores else 0
 
-def pegar_mare(data_iso, tipo):
+def pegar_mares(data_iso, tipo):
     eventos = [e for e in tide_json["data"] if e["type"] == tipo and e["time"].startswith(data_iso)]
-    if eventos:
-        hora = datetime.strptime(eventos[0]["time"], "%Y-%m-%dT%H:%M:%S+00:00")
-        return hora.strftime("%H:%M")
-    return "--:--"
+    mares = []
+    for evento in eventos[:2]:  # até 2 por tipo
+        hora = datetime.strptime(evento["time"], "%Y-%m-%dT%H:%M:%S+00:00")
+        mares.append(hora.strftime("%H:%M"))
+    while len(mares) < 2:
+        mares.append("--:--")
+    return mares
 
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
@@ -136,8 +139,8 @@ def montar_previsao(data_iso):
             f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
             f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
         ),
-        "mare_alta": pegar_mare(data_iso, "high"),
-        "mare_baixa": pegar_mare(data_iso, "low")
+        "mares_altas": pegar_mares(data_iso, "high"),
+        "mares_baixas": pegar_mares(data_iso, "low")
     }
 
 previsao = {
@@ -157,10 +160,12 @@ def gerar_card(dia, dados):
             </div>
             <div class="col-dir">
                 <div class="icon-line"><img src="{dados['lua']}" width="35px" height="35px"/></div>
-                <div class="line"><span class="arrow">⬆️</span> maré</div>
-                <div class="line"><strong>{dados['mare_alta']}</strong></div>
-                <div class="line"><span class="arrow">⬇️</span> maré</div>
-                <div class="line"><strong>{dados['mare_baixa']}</strong></div>
+                <div class="mare-linha"><img src='seta cima.png' width='14px' height='14px'/> maré</div>
+                <div class="hora-mare">{dados['mares_altas'][0]}</div>
+                <div class="hora-mare">{dados['mares_altas'][1]}</div>
+                <div class="mare-linha"><img src='seta baixo.png' width='14px' height='14px'/> maré</div>
+                <div class="hora-mare">{dados['mares_baixas'][0]}</div>
+                <div class="hora-mare">{dados['mares_baixas'][1]}</div>
             </div>
         </div>
     </div>"""
