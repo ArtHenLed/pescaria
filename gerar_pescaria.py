@@ -36,15 +36,26 @@ astro_response = requests.get(
     headers={"Authorization": API_KEY}
 )
 
+tide_response = requests.get(
+    "https://api.stormglass.io/v2/tide/extremes/point",
+    params={
+        "lat": LATITUDE,
+        "lng": LONGITUDE,
+        "start": f"{data_sabado}T00:00:00+00:00",
+        "end": f"{data_domingo}T23:59:59+00:00"
+    },
+    headers={"Authorization": API_KEY}
+)
+
 weather_json = weather_response.json()
 astro_json = astro_response.json()
+tide_json = tide_response.json()
 
-if "hours" not in weather_json or "data" not in astro_json:
+if "hours" not in weather_json or "data" not in astro_json or "data" not in tide_json:
     print("Erro ao obter dados da API")
     exit(1)
 
 dados = weather_json["hours"]
-dados_lua = astro_json["data"]
 
 def icone_clima(prec, cloud):
     if prec > 2 and cloud > 70:
@@ -69,14 +80,11 @@ def icone_lua(data_str):
         "lua quarto minguante.png",
         "lua minguante.png"
     ]
-    # Data de referência: Quarto Minguante em 20/05/2025 às 08:58 UTC
     data_fase_conhecida = datetime(2025, 4, 29, 6, 0)
-    ciclo_lunar_dias = 29 + 12 / 24 + 44 / 1440  # 29 dias, 12h, 44min
-
+    ciclo_lunar_dias = 29 + 12 / 24 + 44 / 1440
     data_alvo = datetime.strptime(data_str, "%Y-%m-%d")
     dias_diferenca = (data_alvo - data_fase_conhecida).total_seconds() / 86400
-    dias_diferenca = dias_diferenca % ciclo_lunar_dias  # ciclo contínuo
-
+    dias_diferenca = dias_diferenca % ciclo_lunar_dias
     fase_index = int((dias_diferenca / ciclo_lunar_dias) * 8) % 8
     return fases[fase_index]
 
@@ -102,17 +110,23 @@ def maximo_por_dia(dados, campo, data_alvo):
     valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
     return round(max(valores), 1) if valores else 0
 
+def pegar_mare(data_iso, tipo):
+    eventos = [e for e in tide_json["data"] if e["type"] == tipo and e["time"].startswith(data_iso)]
+    if eventos:
+        hora = datetime.strptime(eventos[0]["time"], "%Y-%m-%dT%H:%M:%S+00:00")
+        return hora.strftime("%H:%M")
+    return "--:--"
+
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
     vento_val = media_por_dia(dados, "windSpeed", data_iso)
     direcao = next((hora["windDirection"]["noaa"] for hora in dados if hora["time"].startswith(data_iso)), None)
-    lua_valor = icone_lua(data_iso)  # novo cálculo da lua por data
     cloud = media_por_dia(dados, "cloudCover", data_iso)
     prec = media_por_dia(dados, "precipitation", data_iso)
     return {
         "data": dia.strftime("%d/%m"),
         "icone": icone_clima(prec, cloud),
-        "lua": lua_valor,
+        "lua": icone_lua(data_iso),
         "vento": f"<span class='arrow'>{seta_vento(direcao)}</span> <span class='value'>{vento_val}</span> <span class='unit'>km/h</span>",
         "temp_linha": (
             f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
@@ -121,7 +135,9 @@ def montar_previsao(data_iso):
         "pressao_linha": (
             f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
             f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
-        )
+        ),
+        "mare_alta": pegar_mare(data_iso, "high"),
+        "mare_baixa": pegar_mare(data_iso, "low")
     }
 
 previsao = {
@@ -132,10 +148,21 @@ previsao = {
 def gerar_card(dia, dados):
     return f"""<div class="card">
         <h2>{dia.upper()}<br>{dados['data']}</h2>
-        <div class="icon-line"><img src="{dados['icone']}" width="40px" height="45px"/> <img src="{dados['lua']}" width="35px" height="35px"/></div>
-        <div class="line">{dados['vento']}</div>
-        <div class="line">{dados['temp_linha']}</div>
-        <div class="line">{dados['pressao_linha']}</div>
+        <div class="card-content">
+            <div class="col-esq">
+                <div class="icon-line"><img src="{dados['icone']}" width="40px" height="45px"/></div>
+                <div class="line">{dados['vento']}</div>
+                <div class="line">{dados['temp_linha']}</div>
+                <div class="line">{dados['pressao_linha']}</div>
+            </div>
+            <div class="col-dir">
+                <div class="icon-line"><img src="{dados['lua']}" width="35px" height="35px"/></div>
+                <div class="line"><span class="arrow">⬆️</span> maré</div>
+                <div class="line"><strong>{dados['mare_alta']}</strong></div>
+                <div class="line"><span class="arrow">⬇️</span> maré</div>
+                <div class="line"><strong>{dados['mare_baixa']}</strong></div>
+            </div>
+        </div>
     </div>"""
 
 with open("index_base.html", "r", encoding="utf-8") as base:
