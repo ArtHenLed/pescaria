@@ -40,7 +40,7 @@
       background-color: rgba(255, 255, 255, 0.8);
       border-radius: 15px;
       padding: 5px;
-      width: 150px;
+      width: 250px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -49,7 +49,7 @@
     }
 
     .card:first-child {
-      margin-right: 80px;
+      margin-right: 50px;
     }
 
     h2 {
@@ -98,7 +98,6 @@
       font-size: 18px;
     }
 
-    /* NOVO LAYOUT EM DUAS COLUNAS */
     .card-content {
       display: flex;
       flex-direction: row;
@@ -112,6 +111,19 @@
       align-items: center;
       flex: 1;
     }
+
+    .mare-linha {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+    }
+
+    .hora-mare {
+      font-size: 25px;
+      font-weight: bold;
+    }
+
   </style>
 </head>
 <body>
@@ -131,10 +143,12 @@
             </div>
             <div class="col-dir">
                 <div class="icon-line"><img src="lua quarto crescente.png" width="35px" height="35px"/></div>
-                <div class="line"><span class="arrow">⬆️</span> maré</div>
-                <div class="line"><strong>05:03</strong></div>
-                <div class="line"><span class="arrow">⬇️</span> maré</div>
-                <div class="line"><strong>10:28</strong></div>
+                <div class="mare-linha"><img src='seta cima.png' width='14px' height='14px'/> maré</div>
+                <div class="hora-mare">05:03</div>
+                <div class="hora-mare">16:45</div>
+                <div class="mare-linha"><img src='seta baixo.png' width='14px' height='14px'/> maré</div>
+                <div class="hora-mare">10:28</div>
+                <div class="hora-mare">22:43</div>
             </div>
         </div>
     </div><div class="card">
@@ -148,10 +162,12 @@
             </div>
             <div class="col-dir">
                 <div class="icon-line"><img src="lua gibosa crescente.png" width="35px" height="35px"/></div>
-                <div class="line"><span class="arrow">⬆️</span> maré</div>
-                <div class="line"><strong>05:35</strong></div>
-                <div class="line"><span class="arrow">⬇️</span> maré</div>
-                <div class="line"><strong>11:00</strong></div>
+                <div class="mare-linha"><img src='seta cima.png' width='14px' height='14px'/> maré</div>
+                <div class="hora-mare">05:35</div>
+                <div class="hora-mare">17:22</div>
+                <div class="mare-linha"><img src='seta baixo.png' width='14px' height='14px'/> maré</div>
+                <div class="hora-mare">11:00</div>
+                <div class="hora-mare">--:--</div>
             </div>
         </div>
     </div>
