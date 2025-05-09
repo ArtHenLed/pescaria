@@ -58,27 +58,27 @@ def icone_clima(prec, cloud):
     else:
         return "sol.png"
 
-def icone_lua(fase):
-    if fase is None:
-        return "lua desconhecida.png"
-    elif 0.00 <= fase < 0.03 or 0.97 <= fase <= 1.00:
-        return "lua nova.png"
-    elif 0.03 <= fase < 0.22:
-        return "lua crescente.png"
-    elif 0.22 <= fase < 0.28:
-        return "lua quarto crescente.png"
-    elif 0.28 <= fase < 0.47:
-        return "lua gibosa crescente.png"
-    elif 0.47 <= fase < 0.53:
-        return "lua cheia.png"
-    elif 0.53 <= fase < 0.72:
-        return "lua gibosa minguante.png"
-    elif 0.72 <= fase < 0.78:
-        return "lua quarto minguante.png"
-    elif 0.78 <= fase < 0.97:
-        return "lua minguante.png"
-    else:
-        return "lua desconhecida.png"  # segurança extra para valores fora de 0-1
+def icone_lua(data_str):
+    fases = [
+        "lua nova.png",
+        "lua crescente.png",
+        "lua quarto crescente.png",
+        "lua gibosa crescente.png",
+        "lua cheia.png",
+        "lua gibosa minguante.png",
+        "lua quarto minguante.png",
+        "lua minguante.png"
+    ]
+    # Data de referência: Quarto Minguante em 20/05/2025 às 08:58 UTC
+    data_fase_conhecida = datetime(2025, 5, 20, 8, 58)
+    ciclo_lunar_dias = 29 + 12 / 24 + 44 / 1440  # 29 dias, 12h, 44min
+
+    data_alvo = datetime.strptime(data_str, "%Y-%m-%d")
+    dias_diferenca = (data_alvo - data_fase_conhecida).total_seconds() / 86400
+    dias_diferenca = dias_diferenca % ciclo_lunar_dias  # ciclo contínuo
+
+    fase_index = int((dias_diferenca / ciclo_lunar_dias) * 8) % 8
+    return fases[fase_index]
 
 def seta_vento(angulo):
     if angulo is None:
@@ -106,15 +106,13 @@ def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
     vento_val = media_por_dia(dados, "windSpeed", data_iso)
     direcao = next((hora["windDirection"]["noaa"] for hora in dados if hora["time"].startswith(data_iso)), None)
-    lua_valor = next((d["moonPhase"] for d in dados_lua if d["time"].startswith(data_iso)), None)
-    if isinstance(lua_valor, dict):
-        lua_valor = lua_valor.get("noaa", 0)
+    lua_valor = icone_lua(data_iso)  # novo cálculo da lua por data
     cloud = media_por_dia(dados, "cloudCover", data_iso)
     prec = media_por_dia(dados, "precipitation", data_iso)
     return {
         "data": dia.strftime("%d/%m"),
         "icone": icone_clima(prec, cloud),
-        "lua": icone_lua(lua_valor),
+        "lua": lua_valor,
         "vento": f"<span class='arrow'>{seta_vento(direcao)}</span> <span class='value'>{vento_val}</span> <span class='unit'>km/h</span>",
         "temp_linha": (
             f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
