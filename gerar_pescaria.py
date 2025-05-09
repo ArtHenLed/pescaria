@@ -161,12 +161,17 @@ def gerar_card(dia, dados):
             <div class="col-dir">
                 <div class="icon-line"><img src="{dados['lua']}" width="35px" height="35px"/></div>
                 <div class="mare-linha"><img src='seta cima.png' width='14px' height='14px'/> maré</div>
-                <div class="hora-mare">{dados['mares_altas'][0]}</div>
-                <div class="hora-mare">{dados['mares_altas'][1]}</div>
-                <div class="mare-linha"><img src='seta baixo.png' width='14px' height='14px'/> maré</div>
-                <div class="hora-mare">{dados['mares_baixas'][0]}</div>
-                <div class="hora-mare">{dados['mares_baixas'][1]}</div>
-            </div>
+               <div class="mare-linha"><img src='seta cima.png' width='14px' height='14px'/> maré</div>
+<div class="hora-mare-dupla">
+  <span>{dados['mares_altas'][0]}</span>
+  <span>{dados['mares_altas'][1]}</span>
+</div>
+<div class="mare-linha"><img src='seta baixo.png' width='14px' height='14px'/> maré</div>
+<div class="hora-mare-dupla">
+  <span>{dados['mares_baixas'][0]}</span>
+  <span>{dados['mares_baixas'][1]}</span>
+</div>
+
         </div>
     </div>"""
 
