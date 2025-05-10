@@ -116,11 +116,11 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      font-size: 14px;
+      font-size: 18px;
     }
 
     .hora-mare {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
 }
 
@@ -128,65 +128,19 @@
   display: flex;
   justify-content: center;
   gap: 10px;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
 }
 
   </style>
-</head>
-<body>
-  <div class="logo">
-    <img src="marcadagua.jpg" alt="Logo" />
-  </div>
+.hora-mare-dupla {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
 
-  <div class="cards-container">
-    <div class="card">
-        <h2>SÁBADO&nbsp;&nbsp;10/05</h2>
-        <div class="card-content">
-            <div class="col-esq">
-                <div class="icon-line"><img src="sol e nublado.png" width="40px" height="45px"/></div>
-                <div class="line"><span class='arrow'>↘️</span> <span class='value'>1.4</span> <span class='unit'>km/h</span></div>
-                <div class="line"><div><img src='seta cima.png' width='14px'/> <span class='value'>22.8</span> <span class='unit'>°C</span></div><div><img src='seta baixo.png' width='14px'/> <span class='value'>19.7</span> <span class='unit'>°C</span></div></div>
-                <div class="line"><div><img src='seta cima.png' width='14px'/> <span class='value'>1020.6</span> <span class='unit'>hPa</span></div><div><img src='seta baixo.png' width='14px'/> <span class='value'>1011.3</span> <span class='unit'>hPa</span></div></div>
-            </div>
-            <div class="col-dir">
-                <div class="icon-line"><img src="lua quarto crescente.png" width="35px" height="35px"/></div>
-                <div class="mare-linha"><img src='seta cima.png' width='14px' height='14px'/> maré</div>
-                <div class="hora-mare-dupla">
-                  <span>05:03</span>
-                  <span>16:45</span>
-                </div>
-                <div class="mare-linha"><img src='seta baixo.png' width='14px' height='14px'/> maré</div>
-                <div class="hora-mare-dupla">
-                  <span>10:28</span>
-                  <span>22:43</span>
-                </div>
-            </div>
-        </div>
-    </div><div class="card">
-        <h2>DOMINGO&nbsp;&nbsp;11/05</h2>
-        <div class="card-content">
-            <div class="col-esq">
-                <div class="icon-line"><img src="nublado.png" width="40px" height="45px"/></div>
-                <div class="line"><span class='arrow'>↖️</span> <span class='value'>1.5</span> <span class='unit'>km/h</span></div>
-                <div class="line"><div><img src='seta cima.png' width='14px'/> <span class='value'>19.8</span> <span class='unit'>°C</span></div><div><img src='seta baixo.png' width='14px'/> <span class='value'>17.5</span> <span class='unit'>°C</span></div></div>
-                <div class="line"><div><img src='seta cima.png' width='14px'/> <span class='value'>1025.3</span> <span class='unit'>hPa</span></div><div><img src='seta baixo.png' width='14px'/> <span class='value'>1020.2</span> <span class='unit'>hPa</span></div></div>
-            </div>
-            <div class="col-dir">
-                <div class="icon-line"><img src="lua gibosa crescente.png" width="35px" height="35px"/></div>
-                <div class="mare-linha"><img src='seta cima.png' width='14px' height='14px'/> maré</div>
-                <div class="hora-mare-dupla">
-                  <span>05:35</span>
-                  <span>17:22</span>
-                </div>
-                <div class="mare-linha"><img src='seta baixo.png' width='14px' height='14px'/> maré</div>
-                <div class="hora-mare-dupla">
-                  <span>11:00</span>
-                  <span>--:--</span>
-                </div>
-            </div>
-        </div>
-    </div>
-  </div>
-</body>
-</html>
+.col-dir .icon-line {
+  margin-bottom: 20px;
+}
