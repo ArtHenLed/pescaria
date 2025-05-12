@@ -115,7 +115,7 @@ def pegar_mares(data_iso, tipo):
     mares = []
     for evento in eventos[:2]:
         hora = datetime.strptime(evento["time"], "%Y-%m-%dT%H:%M:%S+00:00")
-        mares.append(hora.strftime("%H:%M"))
+       mares.append(f"{hora.hour:02}:{hora.minute:02}")
     while len(mares) < 2:
         mares.append("--:--")
     return mares
