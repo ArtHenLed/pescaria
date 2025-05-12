@@ -108,16 +108,24 @@ def minimo_por_dia(dados, campo, data_alvo):
 
 def maximo_por_dia(dados, campo, data_alvo):
     valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
-    return round(max(valores), 1) if valores else 0
-
-def pegar_mares(data_iso, tipo):
+    def pegar_mares(data_iso, tipo):
     eventos = [e for e in tide_json["data"] if e["type"] == tipo and e["time"].startswith(data_iso)]
     mares = []
-    for evento in eventos[:2]:
+    
+    for i, evento in enumerate(eventos[:2]):
         hora = datetime.strptime(evento["time"], "%Y-%m-%dT%H:%M:%S+00:00")
+        
+        # Se for o segundo horário e ele for menor que o primeiro, soma 12h
+        if i == 1 and len(mares) > 0:
+            primeira_hora = datetime.strptime(eventos[0]["time"], "%Y-%m-%dT%H:%M:%S+00:00")
+            if hora.hour < primeira_hora.hour:
+                hora += timedelta(hours=12)
+        
         mares.append(hora.strftime("%H:%M"))
+
     while len(mares) < 2:
         mares.append("--:--")
+       
     return mares
     
 def montar_previsao(data_iso):
