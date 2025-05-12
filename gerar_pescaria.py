@@ -108,10 +108,12 @@ def minimo_por_dia(dados, campo, data_alvo):
 
 def maximo_por_dia(dados, campo, data_alvo):
     valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
-    def pegar_mares(data_iso, tipo):
+    return round(max(valores), 1) if valores else 0
+
+def pegar_mares(data_iso, tipo):
     eventos = [e for e in tide_json["data"] if e["type"] == tipo and e["time"].startswith(data_iso)]
     mares = []
-    
+
     for i, evento in enumerate(eventos[:2]):
         hora = datetime.strptime(evento["time"], "%Y-%m-%dT%H:%M:%S+00:00")
         
@@ -125,9 +127,9 @@ def maximo_por_dia(dados, campo, data_alvo):
 
     while len(mares) < 2:
         mares.append("--:--")
-       
-    return mares
     
+    return mares
+
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
     vento_val = media_por_dia(dados, "windSpeed", data_iso)
