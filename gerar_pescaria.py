@@ -116,19 +116,50 @@ def pegar_mares(data_iso, tipo):
 
     for i, evento in enumerate(eventos[:2]):
         hora = datetime.strptime(evento["time"], "%Y-%m-%dT%H:%M:%S+00:00")
-        
-        # Se for o segundo horário e ele for menor que o primeiro, soma 12h
         if i == 1 and len(mares) > 0:
             primeira_hora = datetime.strptime(eventos[0]["time"], "%Y-%m-%dT%H:%M:%S+00:00")
             if hora.hour < primeira_hora.hour:
                 hora += timedelta(hours=12)
-        
         mares.append(hora.strftime("%H:%M"))
 
     while len(mares) < 2:
         mares.append("--:--")
-    
     return mares
+
+def avaliar_condicao_pescaria(data_iso, dados, media_por_dia):
+    fases = ["nova", "crescente", "crescente", "crescente", "cheia", "minguante", "minguante", "minguante"]
+    data_fase_conhecida = datetime(2025, 4, 29, 6, 0)
+    ciclo_lunar_dias = 29 + 12 / 24 + 44 / 1440
+    data_alvo = datetime.strptime(data_iso, "%Y-%m-%d")
+    dias_diferenca = (data_alvo - data_fase_conhecida).total_seconds() / 86400
+    dias_diferenca = dias_diferenca % ciclo_lunar_dias
+    fase_index = int((dias_diferenca / ciclo_lunar_dias) * 8) % 8
+    fase = fases[fase_index]
+
+    temp = media_por_dia(dados, "waterTemperature", data_iso)
+    pressao = media_por_dia(dados, "pressure", data_iso)
+
+    if fase == "cheia" and 22 <= temp <= 26 and 1012 <= pressao <= 1018:
+        return "pesca1 otima.png"
+    if fase == "crescente" and (temp < 18 or temp > 30) and (pressao < 1005 or pressao > 1025):
+        return "pesca5 pessima.png"
+
+    nota = 0
+    if fase == "nova": nota += 3
+    elif fase == "minguante": nota += 2
+    elif fase == "crescente": nota += 1
+
+    if 20 <= temp < 22 or 26 < temp <= 28: nota += 3
+    elif 18 <= temp < 20 or 28 < temp <= 30: nota += 2
+    elif 16 <= temp < 18 or 30 < temp <= 32: nota += 1
+
+    if 1008 <= pressao < 1012 or 1018 < pressao <= 1022: nota += 3
+    elif 1005 <= pressao < 1008 or 1022 < pressao <= 1025: nota += 2
+    elif 995 <= pressao < 1005 or 1025 < pressao <= 1030: nota += 1
+
+    if nota >= 8: return "pesca2 boa.png"
+    elif nota >= 5: return "pesca3 media.png"
+    else: return "pesca4 ruim.png"
 
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
@@ -150,7 +181,8 @@ def montar_previsao(data_iso):
             f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
         ),
         "mares_altas": pegar_mares(data_iso, "high"),
-        "mares_baixas": pegar_mares(data_iso, "low")
+        "mares_baixas": pegar_mares(data_iso, "low"),
+        "nota_geral": avaliar_condicao_pescaria(data_iso, dados, media_por_dia)
     }
 
 previsao = {
@@ -179,6 +211,9 @@ def gerar_card(dia, dados):
                 <div class="hora-mare-dupla">
                   <span>{dados['mares_baixas'][0]}</span>
                   <span>{dados['mares_baixas'][1]}</span>
+                </div>
+                <div class="icon-line" style="margin-top: 8px;">
+                  <img src="{dados['nota_geral']}" width="40px" height="45px"/>
                 </div>
             </div>
         </div>
