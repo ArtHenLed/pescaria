@@ -115,11 +115,11 @@ def pegar_mares(data_iso, tipo):
     mares = []
     for evento in eventos[:2]:
         hora = datetime.strptime(evento["time"], "%Y-%m-%dT%H:%M:%S+00:00")
-       mares.append(f"{hora.hour:02}:{hora.minute:02}")
+        mares.append(f"{hora.hour:02}:{hora.minute:02}")
     while len(mares) < 2:
         mares.append("--:--")
     return mares
-
+    
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
     vento_val = media_por_dia(dados, "windSpeed", data_iso)
