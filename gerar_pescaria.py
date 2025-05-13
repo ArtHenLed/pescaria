@@ -110,56 +110,21 @@ def maximo_por_dia(dados, campo, data_alvo):
     valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
     return round(max(valores), 1) if valores else 0
 
-def pegar_mares(data_iso, tipo):
-    eventos = [e for e in tide_json["data"] if e["type"] == tipo and e["time"].startswith(data_iso)]
+def pegar_mares_dupla(data_iso):
+    eventos = [e for e in tide_json["data"] if e["time"].startswith(data_iso)]
     mares = []
 
-    for i, evento in enumerate(eventos[:2]):
+    for evento in eventos:
         hora = datetime.strptime(evento["time"], "%Y-%m-%dT%H:%M:%S+00:00")
-        if i == 1 and len(mares) > 0:
-            primeira_hora = datetime.strptime(eventos[0]["time"], "%Y-%m-%dT%H:%M:%S+00:00")
-            if hora.hour < primeira_hora.hour:
-                hora += timedelta(hours=12)
-        mares.append(hora.strftime("%H:%M"))
+        tipo = evento["type"]
+        mares.append((hora.strftime("%H:%M"), tipo))
 
-    while len(mares) < 2:
-        mares.append("--:--")
-    return mares
+    while len(mares) < 4:
+        mares.append(("--:--", "low"))
 
-def avaliar_condicao_pescaria(data_iso, dados, media_por_dia):
-    fases = ["nova", "crescente", "crescente", "crescente", "cheia", "minguante", "minguante", "minguante"]
-    data_fase_conhecida = datetime(2025, 4, 29, 6, 0)
-    ciclo_lunar_dias = 29 + 12 / 24 + 44 / 1440
-    data_alvo = datetime.strptime(data_iso, "%Y-%m-%d")
-    dias_diferenca = (data_alvo - data_fase_conhecida).total_seconds() / 86400
-    dias_diferenca = dias_diferenca % ciclo_lunar_dias
-    fase_index = int((dias_diferenca / ciclo_lunar_dias) * 8) % 8
-    fase = fases[fase_index]
-
-    temp = media_por_dia(dados, "waterTemperature", data_iso)
-    pressao = media_por_dia(dados, "pressure", data_iso)
-
-    if fase == "cheia" and 22 <= temp <= 26 and 1012 <= pressao <= 1018:
-        return "pesca1 otima.png"
-    if fase == "crescente" and (temp < 18 or temp > 30) and (pressao < 1005 or pressao > 1025):
-        return "pesca5 pessima.png"
-
-    nota = 0
-    if fase == "nova": nota += 3
-    elif fase == "minguante": nota += 2
-    elif fase == "crescente": nota += 1
-
-    if 20 <= temp < 22 or 26 < temp <= 28: nota += 3
-    elif 18 <= temp < 20 or 28 < temp <= 30: nota += 2
-    elif 16 <= temp < 18 or 30 < temp <= 32: nota += 1
-
-    if 1008 <= pressao < 1012 or 1018 < pressao <= 1022: nota += 3
-    elif 1005 <= pressao < 1008 or 1022 < pressao <= 1025: nota += 2
-    elif 995 <= pressao < 1005 or 1025 < pressao <= 1030: nota += 1
-
-    if nota >= 8: return "pesca2 boa.png"
-    elif nota >= 5: return "pesca3 media.png"
-    else: return "pesca4 ruim.png"
+    linha1 = mares[:2]
+    linha2 = mares[2:4]
+    return linha1, linha2
 
 def montar_previsao(data_iso):
     dia = datetime.strptime(data_iso, "%Y-%m-%d")
@@ -167,11 +132,39 @@ def montar_previsao(data_iso):
     direcao = next((hora["windDirection"]["noaa"] for hora in dados if hora["time"].startswith(data_iso)), None)
     cloud = media_por_dia(dados, "cloudCover", data_iso)
     prec = media_por_dia(dados, "precipitation", data_iso)
+    linha1, linha2 = pegar_mares_dupla(data_iso)
     return {
         "data": dia.strftime("%d/%m"),
         "icone": icone_clima(prec, cloud),
         "lua": icone_lua(data_iso),
-        def gerar_card(dia, dados):
+        "vento": f"<span class='arrow'>{seta_vento(direcao)}</span> <span class='value'>{vento_val}</span> <span class='unit'>km/h</span>",
+        "temp_linha": (
+            f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
+            f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
+        ),
+        "pressao_linha": (
+            f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
+            f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
+        ),
+        "mares_linhas": [linha1, linha2]
+    }
+
+previsao = {
+    "sabado": montar_previsao(data_sabado),
+    "domingo": montar_previsao(data_domingo)
+}
+
+def gerar_card(dia, dados):
+    def icone_mare(tipo):
+        return "seta cima.png" if tipo == "high" else "seta baixo.png"
+
+    linha_mare = ""
+    for linha in dados["mares_linhas"]:
+        linha_mare += "<div class='hora-mare-dupla'>"
+        for hora, tipo in linha:
+            linha_mare += f"<span><img src='{icone_mare(tipo)}' width='14px'/> {hora}</span>"
+        linha_mare += "</div>"
+
     return f"""<div class="card">
         <h2>{dia.upper()}&nbsp;&nbsp;{dados['data']}</h2>
         <div class="card-content">
@@ -183,43 +176,8 @@ def montar_previsao(data_iso):
             </div>
             <div class="col-dir">
                 <div class="icon-line"><img src="{dados['lua']}" width="35px" height="35px"/></div>
-                <div class="mare-linha" style="font-weight: bold; margin-bottom: 3px;">marés</div>
-                <div class="hora-mare-dupla">
-                  <span><img src='seta cima.png' width='14px'/> {dados['mares_altas'][0]}</span>
-                  <span><img src='seta baixo.png' width='14px'/> {dados['mares_baixas'][0]}</span>
-                </div>
-                <div class="hora-mare-dupla">
-                  <span><img src='seta baixo.png' width='14px'/> {dados['mares_baixas'][1]}</span>
-                  <span><img src='seta cima.png' width='14px'/> {dados['mares_altas'][1]}</span>
-                </div>
-                <div class="icon-line" style="margin-top: 8px;">
-                  <img src="{dados['nota_geral']}" width="80px" height="90px"/>
-                </div>
-            </div>
-        </div>
-    </div>"""
-
-            <div class="col-esq">
-                <div class="icon-line"><img src="{dados['icone']}" width="40px" height="45px"/></div>
-                <div class="line">{dados['vento']}</div>
-                <div class="line">{dados['temp_linha']}</div>
-                <div class="line">{dados['pressao_linha']}</div>
-            </div>
-            <div class="col-dir">
-                <div class="icon-line"><img src="{dados['lua']}" width="35px" height="35px"/></div>
-                <div class="mare-linha"><img src='seta cima.png' width='14px' height='14px'/> maré</div>
-                <div class="hora-mare-dupla">
-                  <span>{dados['mares_altas'][0]}</span>
-                  <span>{dados['mares_altas'][1]}</span>
-                </div>
-                <div class="mare-linha"><img src='seta baixo.png' width='14px' height='14px'/> maré</div>
-                <div class="hora-mare-dupla">
-                  <span>{dados['mares_baixas'][0]}</span>
-                  <span>{dados['mares_baixas'][1]}</span>
-                </div>
-                <div class="icon-line" style="margin-top: 8px;">
-                  <img src="{dados['nota_geral']}" width="80px" height="90px"/>
-                </div>
+                <div class="mare-linha" style="margin-bottom: 2px;">marés</div>
+                {linha_mare}
             </div>
         </div>
     </div>"""
