@@ -171,29 +171,34 @@ def montar_previsao(data_iso):
         "data": dia.strftime("%d/%m"),
         "icone": icone_clima(prec, cloud),
         "lua": icone_lua(data_iso),
-        "vento": f"<span class='arrow'>{seta_vento(direcao)}</span> <span class='value'>{vento_val}</span> <span class='unit'>km/h</span>",
-        "temp_linha": (
-            f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
-            f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
-        ),
-        "pressao_linha": (
-            f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
-            f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
-        ),
-        "mares_altas": pegar_mares(data_iso, "high"),
-        "mares_baixas": pegar_mares(data_iso, "low"),
-        "nota_geral": avaliar_condicao_pescaria(data_iso, dados, media_por_dia)
-    }
-
-previsao = {
-    "sabado": montar_previsao(data_sabado),
-    "domingo": montar_previsao(data_domingo)
-}
-
-def gerar_card(dia, dados):
+        def gerar_card(dia, dados):
     return f"""<div class="card">
         <h2>{dia.upper()}&nbsp;&nbsp;{dados['data']}</h2>
         <div class="card-content">
+            <div class="col-esq">
+                <div class="icon-line"><img src="{dados['icone']}" width="40px" height="45px"/></div>
+                <div class="line">{dados['vento']}</div>
+                <div class="line">{dados['temp_linha']}</div>
+                <div class="line">{dados['pressao_linha']}</div>
+            </div>
+            <div class="col-dir">
+                <div class="icon-line"><img src="{dados['lua']}" width="35px" height="35px"/></div>
+                <div class="mare-linha" style="font-weight: bold; margin-bottom: 3px;">marés</div>
+                <div class="hora-mare-dupla">
+                  <span><img src='seta cima.png' width='14px'/> {dados['mares_altas'][0]}</span>
+                  <span><img src='seta baixo.png' width='14px'/> {dados['mares_baixas'][0]}</span>
+                </div>
+                <div class="hora-mare-dupla">
+                  <span><img src='seta baixo.png' width='14px'/> {dados['mares_baixas'][1]}</span>
+                  <span><img src='seta cima.png' width='14px'/> {dados['mares_altas'][1]}</span>
+                </div>
+                <div class="icon-line" style="margin-top: 8px;">
+                  <img src="{dados['nota_geral']}" width="80px" height="90px"/>
+                </div>
+            </div>
+        </div>
+    </div>"""
+
             <div class="col-esq">
                 <div class="icon-line"><img src="{dados['icone']}" width="40px" height="45px"/></div>
                 <div class="line">{dados['vento']}</div>
