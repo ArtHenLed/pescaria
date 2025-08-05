@@ -94,7 +94,8 @@ def icone_lua(data_str, astro_data):
     # Percorre os dados astronômicos para encontrar a fase da lua para a data específica
     for day_data in astro_data["data"]:
         if day_data["time"].startswith(data_str):
-            moon_phase_value = day_data["moonPhase"]["value"]
+            # CORREÇÃO: Removido o ".value" conforme a estrutura da API Stormglass
+            moon_phase_value = day_data["moonPhase"]
             break
 
     # Mapeia os valores da API para os nomes dos seus arquivos de imagem
@@ -137,6 +138,9 @@ def maximo_por_dia(dados, campo, data_alvo):
     valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
     return round(max(valores), 1) if valores else 0
 
+# REMOVIDO: Bloco de código incorreto que estava aqui dentro da função minimo_por_dia.
+# Essa lógica de fase da lua pertence apenas à função avaliar_condicao_pescaria.
+
 def pegar_mares_com_icone(data_iso):
     """Formata os horários das marés com seus respectivos ícones."""
     eventos = [e for e in tide_json["data"] if e["time"].startswith(data_iso)]
@@ -160,7 +164,8 @@ def avaliar_condicao_pescaria(data_iso, dados, media_por_dia, astro_data):
     # Obtém a fase da lua da resposta da API de astronomia
     for day_data in astro_data["data"]:
         if day_data["time"].startswith(data_iso):
-            moon_phase_value = day_data["moonPhase"]["value"]
+            # CORREÇÃO: Removido o ".value" conforme a estrutura da API Stormglass
+            moon_phase_value = day_data["moonPhase"]
             break
 
     if moon_phase_value is None:
