@@ -80,7 +80,7 @@ def icone_lua(data_str):
         "lua quarto minguante.png",
         "lua minguante.png"
     ]
-    data_fase_conhecida = datetime(2025, 7, 25, 15, 36, 0)
+    data_fase_conhecida = datetime(2025, 4, 29, 6, 0)
     ciclo_lunar_dias = 29 + 12 / 24 + 44 / 1440
     data_alvo = datetime.strptime(data_str, "%Y-%m-%d")
     dias_diferenca = (data_alvo - data_fase_conhecida).total_seconds() / 86400
@@ -123,7 +123,7 @@ def pegar_mares_com_icone(data_iso):
 
 def avaliar_condicao_pescaria(data_iso, dados, media_por_dia):
     fases = ["nova", "crescente", "crescente", "crescente", "cheia", "minguante", "minguante", "minguante"]
-    data_fase_conhecida = datetime(2025, 7, 25, 15, 36, 0)
+    data_fase_conhecida = datetime(2025, 4, 29, 6, 0)
     ciclo_lunar_dias = 29 + 12 / 24 + 44 / 1440
     data_alvo = datetime.strptime(data_iso, "%Y-%m-%d")
     dias_diferenca = (data_alvo - data_fase_conhecida).total_seconds() / 86400
