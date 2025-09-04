@@ -217,7 +217,7 @@ def gerar_card(dia, dados):
                     <span><img src="{dados['mares'][2][0]}" width="14px"/> {dados['mares'][2][1]}</span>
                     <span><img src="{dados['mares'][3][0]}" width="14px"/> {dados['mares'][3][1]}</span>
                 </div>
-                <div class="icon-line" style="margin-top: 8px;">
+                <div class="icon-line" style="margin-top: 6px;">
                     <img src="{dados['nota_geral']}" width="80px" height="90px"/>
                 </div>
             </div>
@@ -227,7 +227,7 @@ def gerar_card(dia, dados):
 with open("index_base.html", "r", encoding="utf-8") as base:
     html_base = base.read()
 
-html_cards = gerar_card("SÃ¡bado", previsao["sabado"]) + gerar_card("Domingo", previsao["domingo"])
+html_cards = gerar_card("SÁBADO", previsao["sabado"]) + gerar_card("DOMINGO", previsao["domingo"])
 html_final = html_base.replace("{{PREVISAO_PESCARIA}}", html_cards)
 
 with open("index.html", "w", encoding="utf-8") as saida:
