@@ -91,12 +91,21 @@ def icone_lua(data_str):
 def seta_vento(angulo):
     if angulo is None:
         return ""
-    direcoes = [(0, "â¬‡ï¸"), (45, "â†™ï¸"), (90, "â¬…ï¸"), (135, "â†–ï¸"), (180, "â¬†ï¸"),
-                (225, "â†—ï¸"), (270, "âž¡ï¸"), (315, "â†˜ï¸"), (360, "â¬‡ï¸")]
-    for i in range(len(direcoes) - 1):
-        if direcoes[i][0] <= angulo < direcoes[i + 1][0]:
-            return direcoes[i][1]
-    return ""
+    # CORREÇÃO: Usando os símbolos de seta corretos (Unicode)
+    direcoes = {
+        (337.5, 360): "↓", (0, 22.5): "↓",
+        (22.5, 67.5): "↙",
+        (67.5, 112.5): "←",
+        (112.5, 157.5): "↖",
+        (157.5, 202.5): "↑",
+        (202.5, 247.5): "↗",
+        (247.5, 292.5): "→",
+        (292.5, 337.5): "↘",
+    }
+    for range_graus, seta in direcoes.items():
+        if range_graus[0] <= angulo < range_graus[1]:
+            return seta
+    return "↓" # Retorna um padrão caso não encontre
 
 def media_por_dia(dados, campo, data_alvo):
     valores = [hora[campo]['noaa'] for hora in dados if hora['time'].startswith(data_alvo)]
@@ -168,8 +177,9 @@ def montar_previsao(data_iso):
         "lua": icone_lua(data_iso),
         "vento": f"<span class='arrow'>{seta_vento(direcao)}</span> <span class='value'>{vento_val}</span> <span class='unit'>km/h</span>",
         "temp_linha": (
-            f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>Â°C</span></div>"
-            f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>Â°C</span></div>"
+            # CORREÇÃO: Trocado 'Â°C' por '°C'
+            f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
+            f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
         ),
         "pressao_linha": (
             f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
@@ -185,8 +195,10 @@ previsao = {
 }
 
 def gerar_card(dia, dados):
+    # CORREÇÃO: Trocado 'marÃ©s' por 'Marés' e corrigido o título do dia
+    dia_corrigido = "SÁBADO" if "sabado" in dia.lower() else dia.upper()
     return f"""<div class="card">
-        <h2>{dia.upper()}&nbsp;&nbsp;{dados['data']}</h2>
+        <h2>{dia_corrigido}&nbsp;&nbsp;{dados['data']}</h2>
         <div class="card-content">
             <div class="col-esq">
                 <div class="icon-line"><img src="{dados['icone']}" width="40px" height="45px"/></div>
@@ -196,7 +208,7 @@ def gerar_card(dia, dados):
             </div>
             <div class="col-dir">
                 <div class="icon-line"><img src="{dados['lua']}" width="35px" height="35px"/></div>
-                <div class="mare-linha" style="font-size: 18px; margin-bottom: 4px;">marÃ©s</div>
+                <div class="mare-linha" style="font-size: 18px; margin-bottom: 4px;">Marés</div>
                 <div class="hora-mare-dupla">
                     <span><img src="{dados['mares'][0][0]}" width="14px"/> {dados['mares'][0][1]}</span>
                     <span><img src="{dados['mares'][1][0]}" width="14px"/> {dados['mares'][1][1]}</span>
