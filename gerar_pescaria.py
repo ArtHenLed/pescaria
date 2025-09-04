@@ -217,7 +217,7 @@ def gerar_card(dia, dados):
                     <span><img src="{dados['mares'][2][0]}" width="14px"/> {dados['mares'][2][1]}</span>
                     <span><img src="{dados['mares'][3][0]}" width="14px"/> {dados['mares'][3][1]}</span>
                 </div>
-                <div class="icon-line" style="margin-top: 6px;">
+                <div class="icon-line" style="margin-top: 4px;">
                     <img src="{dados['nota_geral']}" width="80px" height="90px"/>
                 </div>
             </div>
