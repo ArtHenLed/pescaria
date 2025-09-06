@@ -210,12 +210,12 @@ def gerar_card(dia, dados):
                 <div class="icon-line"><img src="{dados['lua']}" width="35px" height="35px"/></div>
                 <div class="mare-linha" style="font-size: 18px; margin-bottom: 4px;">Marés</div>
                 <div class="hora-mare-dupla">
-                    <span><img src="{dados['mares'][0][0]}" width="14px"/> {dados['mares'][0][1]}</span>
-                    <span><img src="{dados['mares'][1][0]}" width="14px"/> {dados['mares'][1][1]}</span>
+                    <span><img src="{dados['mares'][0][0]}" width="7px"/> {dados['mares'][0][1]}</span>
+                    <span><img src="{dados['mares'][1][0]}" width="7px"/> {dados['mares'][1][1]}</span>
                 </div>
                 <div class="hora-mare-dupla">
-                    <span><img src="{dados['mares'][2][0]}" width="14px"/> {dados['mares'][2][1]}</span>
-                    <span><img src="{dados['mares'][3][0]}" width="14px"/> {dados['mares'][3][1]}</span>
+                    <span><img src="{dados['mares'][2][0]}" width="7px"/> {dados['mares'][2][1]}</span>
+                    <span><img src="{dados['mares'][3][0]}" width="7px"/> {dados['mares'][3][1]}</span>
                 </div>
                 <div class="icon-line" style="margin-top: 4px;">
                     <img src="{dados['nota_geral']}" width="80px" height="90px"/>
