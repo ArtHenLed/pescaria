@@ -123,13 +123,24 @@
       font-weight: bold;
     }
 
-    .hora-mare-dupla {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      font-size: 20px;
-      font-weight: bold;
-    }
+    /* ===== COLE ESTE NOVO CÓDIGO ===== */
+.mare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Cria a grade 2x2 */
+  gap: 4px 8px; /* Espaço vertical e horizontal */
+  width: 100%;
+  margin-top: 5px;
+}
+
+.mare-item {
+  display: flex;
+  align-items: center; /* Alinha a seta e a hora no centro */
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  gap: 4px; /* Espaço entre a seta e a hora */
+}
+/* ===== FIM DO CÓDIGO NOVO ===== */
 
     .col-dir .icon-line {
       margin-bottom: 20px;
