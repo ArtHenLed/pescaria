@@ -209,8 +209,7 @@ def gerar_card(dia, dados):
             <div class="col-dir">
                 <div class="icon-line"><img src="{dados['lua']}" width="35px" height="35px"/></div>
                 <div class="mare-linha" style="font-size: 18px; margin-bottom: 4px;">Marés</div>
-                # O NOVO CÓDIGO para colocar no lugar do que você vai apagar:
-<div class="mare-grid">
+                <div class="mare-grid">
     <div class="mare-item"><img src="{dados['mares'][0][0]}" width="14px"/> {dados['mares'][0][1]}</div>
     <div class="mare-item"><img src="{dados['mares'][1][0]}" width="14px"/> {dados['mares'][1][1]}</div>
     <div class="mare-item"><img src="{dados['mares'][2][0]}" width="14px"/> {dados['mares'][2][1]}</div>
