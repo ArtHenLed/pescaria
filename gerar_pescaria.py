@@ -143,19 +143,15 @@ def montar_previsao(data_iso):
         "data": dia.strftime("%d/%m"),
         "icone": icone_clima(prec, cloud),
         "lua": icone_lua(data_iso),
-        "vento": f"<span class='arrow'>{seta_vento(direcao)}</span> <span class='value'>{vento_val}</span> <span class='unit'>km/h</span>",
-        "temp_linha": (
-            f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
-            f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></div>"
-        ),
-        "pressao_linha": (
-            f"<div><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
-            f"<div><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></div>"
-        ),
+        "vento": f"<span><span class='arrow'>{seta_vento(direcao)}</span> <span class='value'>{vento_val}</span> <span class='unit'>km/h</span></span>",
+        # ABAIXO, SEPARAMOS AS VARIÁVEIS
+        "temp_max": f"<span><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></span>",
+        "temp_min": f"<span><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span> <span class='unit'>°C</span></span>",
+        "pressao_max": f"<span><img src='seta cima.png' width='14px'/> <span class='value'>{maximo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></span>",
+        "pressao_min": f"<span><img src='seta baixo.png' width='14px'/> <span class='value'>{minimo_por_dia(dados, 'pressure', data_iso)}</span> <span class='unit'>hPa</span></span>",
         "mares": pegar_mares_com_icone(data_iso),
         "nota_geral": avaliar_condicao_pescaria(data_iso, dados, media_por_dia)
     }
-
 previsao = {
     "sabado": montar_previsao(data_sabado),
     "domingo": montar_previsao(data_domingo)
@@ -168,8 +164,10 @@ def gerar_card(dia, dados):
             <div class="col-esq">
                 <div class="icon-line"><img src="{dados['icone']}" width="40px" height="45px"/></div>
                 <div class="line">{dados['vento']}</div>
-                <div class="line">{dados['temp_linha']}</div>
-                <div class="line">{dados['pressao_linha']}</div>
+               <div class="line">{dados['temp_max']}</div>
+<div class="line">{dados['temp_min']}</div>
+<div class="line">{dados['pressao_max']}</div>
+<div class="line">{dados['pressao_min']}</div>
             </div>
             <div class="col-dir">
                 <div class="icon-line"><img src="{dados['lua']}" width="35px" height="35px"/></div>
