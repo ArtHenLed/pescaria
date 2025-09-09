@@ -21,22 +21,18 @@
       color: black;
       text-align: center;
     }
-
     .logo {
       margin-top: 5px;
     }
-
     .logo img {
       height: 70px;
     }
-
     .cards-container {
       display: flex;
       justify-content: center;
       margin-top: 10px;
-      gap: 10px; /* Adicione esta linha */
+      gap: 10px;
     }
-
     .card {
       background-color: rgba(255, 255, 255, 0.8);
       border-radius: 15px;
@@ -48,14 +44,10 @@
       color: black;
       border: 2px solid black;
     }
-
-    }
-
     h2 {
       font-size: 20px;
       margin: 5px 0;
     }
-
     .icon-line {
       display: flex;
       justify-content: center;
@@ -63,95 +55,74 @@
       gap: 24px;
       margin: 5px 0;
     }
-
     .line {
-      margin: 4px 0;
+      width: 100%;
+      margin: 2px 0;
       font-size: 14px;
       color: black;
-    }
-
-    .line div {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
     }
-
     .line img {
       width: 14px;
       height: 14px;
       margin-right: 4px;
     }
-
     .arrow, .value, .unit {
       display: inline-block;
       vertical-align: middle;
     }
-
     .value {
       font-size: 25px;
       margin: 0 2px;
       font-weight: bold;
     }
-
     .unit {
       font-size: 18px;
     }
-
     .card-content {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
       width: 100%;
     }
-
     .col-esq, .col-dir {
       display: flex;
       flex-direction: column;
       align-items: center;
       flex: 1;
     }
-
     .mare-linha {
       display: flex;
       align-items: center;
       gap: 4px;
       font-size: 18px;
     }
-
-    .hora-mare {
-      font-size: 20px;
+    /* ===== CÓDIGO FINAL PARA AS MARÉS ===== */
+    .mare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Cria a grade 2x2 */
+      gap: 5px;                       /* Espaço entre os itens */
+      width: 100%;
+      margin-top: 5px;
+    }
+    .mare-item {
+      display: flex;
+      flex-direction: row;    /* FORÇA a direção para ser horizontal (lado a lado) */
+      align-items: center;    /* FORÇA o alinhamento vertical no centro */
+      justify-content: center;
+      gap: 5px;
+      font-size: 18px;
       font-weight: bold;
     }
-
-    /* ===== COLE ESTE NOVO CÓDIGO ===== */
-.mare-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* Cria a grade 2x2 */
-  gap: 4px 8px; /* Espaço vertical e horizontal */
-  width: 100%;
-  margin-top: 5px;
-}
-
-.mare-item {
-  display: flex;
-  align-items: center; /* Alinha a seta e a hora no centro */
-  justify-content: center;
-  font-size: 18px;
-  font-weight: bold;
-  gap: 4px; /* Espaço entre a seta e a hora */
-}
-/* ===== FIM DO CÓDIGO NOVO ===== */
-
-    .col-dir .icon-line {
-      margin-bottom: 20px;
-    }
+    /* ===== FIM DO CÓDIGO FINAL ===== */
   </style>
 </head>
 <body>
   <div class="logo">
     <img src="marcadagua.jpg" alt="Logo" />
   </div>
-
   <div class="cards-container">
     <div class="card">
         <h2>SÁBADO&nbsp;&nbsp;13/09</h2>
@@ -166,11 +137,10 @@
                 <div class="icon-line"><img src="lua gibosa minguante.png" width="35px" height="35px"/></div>
                 <div class="mare-linha" style="font-size: 18px; margin-bottom: 4px;">Marés</div>
                 <div class="mare-grid">
-    <div class="mare-item"><img src="seta baixo.png" width="14px"/> 01:38</div>
-    <div class="mare-item"><img src="seta cima.png" width="14px"/> 05:38</div>
-    <div class="mare-item"><img src="seta baixo.png" width="14px"/> 07:25</div>
-    <div class="mare-item"><img src="seta cima.png" width="14px"/> 10:46</div>
-</div>
+                    <div class="mare-item"><img src="seta baixo.png" width="14px"/> 01:38</div>
+                    <div class="mare-item"><img src="seta cima.png" width="14px"/> 05:38</div>
+                    <div class="mare-item"><img src="seta baixo.png" width="14px"/> 07:25</div>
+                    <div class="mare-item"><img src="seta cima.png" width="14px"/> 10:46</div>
                 </div>
                 <div class="icon-line" style="margin-top: 4px;">
                     <img src="pesca3 media.png" width="80px" height="90px"/>
@@ -190,11 +160,10 @@
                 <div class="icon-line"><img src="lua gibosa minguante.png" width="35px" height="35px"/></div>
                 <div class="mare-linha" style="font-size: 18px; margin-bottom: 4px;">Marés</div>
                 <div class="mare-grid">
-    <div class="mare-item"><img src="seta baixo.png" width="14px"/> 02:13</div>
-    <div class="mare-item"><img src="seta cima.png" width="14px"/> 05:50</div>
-    <div class="mare-item"><img src="seta baixo.png" width="14px"/> 08:36</div>
-    <div class="mare-item"><img src="seta cima.png" width="14px"/> 12:19</div>
-</div>
+                    <div class="mare-item"><img src="seta baixo.png" width="14px"/> 02:13</div>
+                    <div class="mare-item"><img src="seta cima.png" width="14px"/> 05:50</div>
+                    <div class="mare-item"><img src="seta baixo.png" width="14px"/> 08:36</div>
+                    <div class="mare-item"><img src="seta cima.png" width="14px"/> 12:19</div>
                 </div>
                 <div class="icon-line" style="margin-top: 4px;">
                     <img src="pesca3 media.png" width="80px" height="90px"/>
