@@ -42,7 +42,7 @@
       flex-direction: column;
       align-items: center;
       color: black;
-      border: 2px solid black;
+      border: 1px solid black;
     }
     h2 {
       font-size: 20px;
@@ -55,34 +55,31 @@
       gap: 24px;
       margin: 5px 0;
     }
+    /* ESTA É A REGRA DE CORREÇÃO FINAL */
     .line {
-    width: 100%;
-    margin: 2px 0;
-    font-size: 14px;
-    color: black;
-    display: grid;
-    /* Coluna da Seta (25px), Coluna do Valor (resto), Coluna da Unidade (auto) */
-    grid-template-columns: 25px 1fr auto; 
-    align-items: center;
-    gap: 4px;
-}
+      width: 100%;
+      display: grid;
+      grid-template-columns: 25px 1fr auto;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      padding: 1px 0;
     }
     .line img {
       width: 14px;
       height: 14px;
-      margin-right: 4px;
     }
     .arrow, .value, .unit {
       display: inline-block;
-      vertical-align: middle;
     }
     .value {
-      font-size: 25px;
-      margin: 0 2px;
+      font-size: 22px;
       font-weight: bold;
+      text-align: right;
     }
     .unit {
       font-size: 18px;
+      text-align: left;
     }
     .card-content {
       display: flex;
@@ -97,29 +94,24 @@
       flex: 1;
     }
     .mare-linha {
-      display: flex;
-      align-items: center;
-      gap: 4px;
       font-size: 18px;
     }
-    /* ===== CÓDIGO FINAL PARA AS MARÉS ===== */
     .mare-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr; /* Cria a grade 2x2 */
-      gap: 5px;                       /* Espaço entre os itens */
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 8px;
       width: 100%;
       margin-top: 5px;
     }
     .mare-item {
       display: flex;
-      flex-direction: row;    /* FORÇA a direção para ser horizontal (lado a lado) */
-      align-items: center;    /* FORÇA o alinhamento vertical no centro */
+      flex-direction: row;
+      align-items: center;
       justify-content: center;
       gap: 5px;
       font-size: 18px;
       font-weight: bold;
     }
-    /* ===== FIM DO CÓDIGO FINAL ===== */
   </style>
 </head>
 <body>
