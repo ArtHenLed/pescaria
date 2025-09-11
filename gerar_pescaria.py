@@ -68,7 +68,7 @@ def maximo_por_dia(dados, campo, data_alvo):
     return round(max(valores), 1) if valores else 0
 
 def pegar_mares_com_icone(data_iso):
-    eventos = [e for e in tide_json["data"] if e["time'].startswith(data_iso)]
+    eventos = [e for e in tide_json["data"] if e["time"].startswith(data_iso)]
     mares_formatados = []
     for evento in eventos[:4]:
         hora = datetime.fromisoformat(evento["time"])
