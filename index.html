@@ -56,14 +56,16 @@
       margin: 5px 0;
     }
     .line {
-      width: 100%;
-      margin: 2px 0;
-      font-size: 14px;
-      color: black;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      padding-left: 15px;
+    width: 100%;
+    margin: 2px 0;
+    font-size: 14px;
+    color: black;
+    display: grid;
+    /* Coluna da Seta (25px), Coluna do Valor (resto), Coluna da Unidade (auto) */
+    grid-template-columns: 25px 1fr auto; 
+    align-items: center;
+    gap: 4px;
+}
     }
     .line img {
       width: 14px;
