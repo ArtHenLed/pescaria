@@ -42,7 +42,7 @@
       flex-direction: column;
       align-items: center;
       color: black;
-      border: 2px solid black;
+      border: 1px solid black;
     }
     h2 {
       font-size: 20px;
@@ -56,33 +56,29 @@
       margin: 5px 0;
     }
     .line {
-    width: 100%;
-    margin: 2px 0;
-    font-size: 14px;
-    color: black;
-    display: grid;
-    /* Coluna da Seta (25px), Coluna do Valor (resto), Coluna da Unidade (auto) */
-    grid-template-columns: 25px 1fr auto; 
-    align-items: center;
-    gap: 4px;
-}
+      width: 100%;
+      display: grid;
+      grid-template-columns: 25px 1fr auto;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      padding: 1px 0;
     }
     .line img {
       width: 14px;
       height: 14px;
-      margin-right: 4px;
     }
     .arrow, .value, .unit {
       display: inline-block;
-      vertical-align: middle;
     }
     .value {
-      font-size: 25px;
-      margin: 0 2px;
+      font-size: 22px;
       font-weight: bold;
+      text-align: right;
     }
     .unit {
       font-size: 18px;
+      text-align: left;
     }
     .card-content {
       display: flex;
@@ -97,29 +93,24 @@
       flex: 1;
     }
     .mare-linha {
-      display: flex;
-      align-items: center;
-      gap: 4px;
       font-size: 18px;
     }
-    /* ===== CÓDIGO FINAL PARA AS MARÉS ===== */
     .mare-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr; /* Cria a grade 2x2 */
-      gap: 5px;                       /* Espaço entre os itens */
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 8px;
       width: 100%;
       margin-top: 5px;
     }
     .mare-item {
       display: flex;
-      flex-direction: row;    /* FORÇA a direção para ser horizontal (lado a lado) */
-      align-items: center;    /* FORÇA o alinhamento vertical no centro */
+      flex-direction: row;
+      align-items: center;
       justify-content: center;
       gap: 5px;
       font-size: 18px;
       font-weight: bold;
     }
-    /* ===== FIM DO CÓDIGO FINAL ===== */
   </style>
 </head>
 <body>
@@ -132,11 +123,11 @@
         <div class="card-content">
             <div class="col-esq">
                 <div class="icon-line"><img src="nublado.png" width="40px" height="45px"/></div>
-                <div class="line"><span><span class='arrow'>↖</span> <span class='value'>1.8</span> <span class='unit'>km/h</span></span></div>
-               <div class="line"><span><img src='seta cima.png' width='14px'/> <span class='value'>22.2</span> <span class='unit'>°C</span></span></div>
-<div class="line"><span><img src='seta baixo.png' width='14px'/> <span class='value'>15.9</span> <span class='unit'>°C</span></span></div>
-<div class="line"><span><img src='seta cima.png' width='14px'/> <span class='value'>1024.0</span> <span class='unit'>hPa</span></span></div>
-<div class="line"><span><img src='seta baixo.png' width='14px'/> <span class='value'>1020.0</span> <span class='unit'>hPa</span></span></div>
+                <div class="line"><span class='arrow'>↖</span><span class='value'>1.8</span><span class='unit'>km/h</span></div>
+                <div class="line"><img src='seta cima.png' width='14px'/><span class='value'>22.2</span><span class='unit'>°C</span></div>
+                <div class="line"><img src='seta baixo.png' width='14px'/><span class='value'>15.9</span><span class='unit'>°C</span></div>
+                <div class="line"><img src='seta cima.png' width='14px'/><span class='value'>1024.0</span><span class='unit'>hPa</span></div>
+                <div class="line"><img src='seta baixo.png' width='14px'/><span class='value'>1020.0</span><span class='unit'>hPa</span></div>
             </div>
             <div class="col-dir">
                 <div class="icon-line"><img src="lua gibosa minguante.png" width="35px" height="35px"/></div>
@@ -157,11 +148,11 @@
         <div class="card-content">
             <div class="col-esq">
                 <div class="icon-line"><img src="sol e nublado.png" width="40px" height="45px"/></div>
-                <div class="line"><span><span class='arrow'>←</span> <span class='value'>1.5</span> <span class='unit'>km/h</span></span></div>
-               <div class="line"><span><img src='seta cima.png' width='14px'/> <span class='value'>25.8</span> <span class='unit'>°C</span></span></div>
-<div class="line"><span><img src='seta baixo.png' width='14px'/> <span class='value'>13.5</span> <span class='unit'>°C</span></span></div>
-<div class="line"><span><img src='seta cima.png' width='14px'/> <span class='value'>1022.0</span> <span class='unit'>hPa</span></span></div>
-<div class="line"><span><img src='seta baixo.png' width='14px'/> <span class='value'>1017.2</span> <span class='unit'>hPa</span></span></div>
+                <div class="line"><span class='arrow'>←</span><span class='value'>1.5</span><span class='unit'>km/h</span></div>
+                <div class="line"><img src='seta cima.png' width='14px'/><span class='value'>25.8</span><span class='unit'>°C</span></div>
+                <div class="line"><img src='seta baixo.png' width='14px'/><span class='value'>13.5</span><span class='unit'>°C</span></div>
+                <div class="line"><img src='seta cima.png' width='14px'/><span class='value'>1022.0</span><span class='unit'>hPa</span></div>
+                <div class="line"><img src='seta baixo.png' width='14px'/><span class='value'>1017.2</span><span class='unit'>hPa</span></div>
             </div>
             <div class="col-dir">
                 <div class="icon-line"><img src="lua gibosa minguante.png" width="35px" height="35px"/></div>
