@@ -13,7 +13,8 @@ data_sabado = (hoje + timedelta(days=dias_ate_sabado)).strftime("%Y-%m-%d")
 data_domingo = (hoje + timedelta(days=dias_ate_domingo)).strftime("%Y-%m-%d")
 
 try:
-    weather_response = requests.get("https://api.stormglass.io/v2/weather/point", params={"lat": LATITUDE, "lng": LONGITUDE, "params": "waterTemperature,windSpeed,windDirection,pressure,cloudCover,precipitation", "start": f"{data_sabado}T00:00:00+00:00", "end": f"{data_domingo}T23:59:59+00:00", "source": "noaa"}, headers={"Authorization": API_KEY})
+    # CORREÇÃO 1: Alterado de waterTemperature para airTemperature nos parâmetros da API
+    weather_response = requests.get("https://api.stormglass.io/v2/weather/point", params={"lat": LATITUDE, "lng": LONGITUDE, "params": "airTemperature,windSpeed,windDirection,pressure,cloudCover,precipitation", "start": f"{data_sabado}T00:00:00+00:00", "end": f"{data_domingo}T23:59:59+00:00", "source": "noaa"}, headers={"Authorization": API_KEY})
     weather_response.raise_for_status()
     astro_response = requests.get("https://api.stormglass.io/v2/astronomy/point", params={"lat": LATITUDE, "lng": LONGITUDE, "start": f"{data_sabado}T00:00:00+00:00", "end": f"{data_domingo}T23:59:59+00:00"}, headers={"Authorization": API_KEY})
     astro_response.raise_for_status()
@@ -86,7 +87,8 @@ def avaliar_condicao_pescaria(data_iso, dados, media_por_dia):
     dias_diferenca = (data_alvo - data_fase_conhecida).total_seconds() / 86400
     fase_index = int((dias_diferenca % ciclo_lunar_dias) / ciclo_lunar_dias * 8)
     fase = fases[fase_index]
-    temp = media_por_dia(dados, "waterTemperature", data_iso)
+    # CORREÇÃO 2: Alterado de waterTemperature para airTemperature
+    temp = media_por_dia(dados, "airTemperature", data_iso)
     pressao = media_por_dia(dados, "pressure", data_iso)
     if fase == "cheia" and 22 <= temp <= 26 and 1012 <= pressao <= 1018: return "pesca1 otima.png"
     if fase == "crescente" and (temp < 18 or temp > 30) and (pressao < 1005 or pressao > 1025): return "pesca5 pessima.png"
@@ -115,8 +117,9 @@ def montar_previsao(data_iso):
         "icone": icone_clima(prec, cloud),
         "lua": icone_lua(data_iso),
         "vento": f"<span class='arrow'>{seta_vento(direcao)}</span><span class='value'>{vento_val}</span><span class='unit'>km/h</span>",
-        "temp_max": f"<img src='seta cima.png' width='14px'/><span class='value'>{maximo_por_dia(dados, 'waterTemperature', data_iso)}</span><span class='unit'>°C</span>",
-        "temp_min": f"<img src='seta baixo.png' width='14px'/><span class='value'>{minimo_por_dia(dados, 'waterTemperature', data_iso)}</span><span class='unit'>°C</span>",
+        # CORREÇÃO 3 e 4: Alterados de waterTemperature para airTemperature
+        "temp_max": f"<img src='seta cima.png' width='14px'/><span class='value'>{maximo_por_dia(dados, 'airTemperature', data_iso)}</span><span class='unit'>°C</span>",
+        "temp_min": f"<img src='seta baixo.png' width='14px'/><span class='value'>{minimo_por_dia(dados, 'airTemperature', data_iso)}</span><span class='unit'>°C</span>",
         "pressao_max": f"<img src='seta cima.png' width='14px'/><span class='value'>{maximo_por_dia(dados, 'pressure', data_iso)}</span><span class='unit'>hPa</span>",
         "pressao_min": f"<img src='seta baixo.png' width='14px'/><span class='value'>{minimo_por_dia(dados, 'pressure', data_iso)}</span><span class='unit'>hPa</span>",
         "mares": pegar_mares_com_icone(data_iso),
